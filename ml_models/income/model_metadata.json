@@ -1,0 +1,59 @@
+{
+  "target": "income",
+  "label_mapping": {
+    "0": "≤ 50 000 USD / an",
+    "1": "> 50 000 USD / an"
+  },
+  "positive_class": 1,
+  "raw_expected_columns": [
+    "age",
+    "education",
+    "workclass",
+    "occupation",
+    "relationship",
+    "hours-per-week",
+    "capital-gain",
+    "capital-loss"
+  ],
+  "threshold": 0.63,
+  "threshold_rule": "max F1 sur prédictions out-of-fold du train (5 plis)",
+  "model": "XGBoost réglé (XGBClassifier) dans un Pipeline scikit-learn",
+  "hyperparameters": {
+    "n_estimators": 600,
+    "learning_rate": 0.1,
+    "max_depth": 5,
+    "min_child_weight": 5,
+    "reg_lambda": 5,
+    "subsample": 1.0,
+    "colsample_bytree": 0.7,
+    "scale_pos_weight": 3.1768
+  },
+  "excluded_on_purpose": [
+    "sex",
+    "race",
+    "marital-status",
+    "native-country",
+    "fnlwgt"
+  ],
+  "test_metrics": {
+    "roc_auc": 0.9326,
+    "f1_positive": 0.7312,
+    "accuracy": 0.8606,
+    "balanced_accuracy": 0.8371,
+    "precision_positive": 0.6791,
+    "recall_positive": 0.792,
+    "baseline_accuracy": 0.7606
+  },
+  "data_source": "UCI Adult (adult-all.csv), 48 790 lignes après nettoyage, recensement US 1994",
+  "model_is_decision_support_only": true,
+  "training_seed": 42,
+  "trained_on": "2026-10-19",
+  "versions": {
+    "python": "3.13.15",
+    "scikit-learn": "1.8.0",
+    "xgboost": "3.1.3",
+    "pandas": "2.2.3",
+    "numpy": "2.3.5",
+    "joblib": "1.5.3"
+  }
+}
