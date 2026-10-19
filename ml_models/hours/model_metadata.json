@@ -1,0 +1,38 @@
+{
+  "target": "part_time (hours-per-week <= 34)",
+  "model": "XGBClassifier (RandomizedSearchCV, 20 iterations)",
+  "artifact_format": "dict joblib: modele, scaler, colonnes, continues, seuil, categories, metriques, taux_base, versions",
+  "form_fields": [
+    "age",
+    "education",
+    "workclass",
+    "occupation",
+    "marital_status",
+    "capital_gain",
+    "capital_loss",
+    "native_us"
+  ],
+  "n_columns_after_one_hot": 34,
+  "threshold": 0.25,
+  "metrics_test": {
+    "auc": 0.824,
+    "f1": 0.535,
+    "precision": 0.475,
+    "recall": 0.614,
+    "accuracy": 0.816
+  },
+  "excluded_features": [
+    "hours-per-week",
+    "sex",
+    "race",
+    "relationship",
+    "income"
+  ],
+  "notebook_versions": {
+    "scikit-learn": "1.8.0",
+    "xgboost": "3.1.3"
+  },
+  "author": "Bessem (Membre 04)",
+  "training_seed": 42,
+  "generated_by": "scripts/train_hours.py"
+}
