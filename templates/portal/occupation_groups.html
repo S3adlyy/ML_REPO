@@ -1,0 +1,49 @@
+<style>
+.occ-groups{margin-top:21px}
+.occ-groups h2{font-size:21px;letter-spacing:-.55px;margin:8px 0 4px}
+.occ-groups>p{color:#91a0b8;font-size:11.5px;margin:0 0 18px}
+.occ-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px}
+.occ-card{--c:var(--teal);position:relative;overflow:hidden;border:1px solid #303c55;border-radius:16px;background:linear-gradient(150deg,#182236,#111a2b);padding:21px;transition:border-color .2s,box-shadow .2s}
+.occ-card.g0{--c:var(--orange)}.occ-card.g1{--c:var(--teal)}.occ-card.g2{--c:var(--violet)}
+.occ-card.is-match{border-color:var(--c);box-shadow:0 0 0 2px color-mix(in srgb,var(--c) 40%,transparent)}
+.occ-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.occ-num{font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--c)}
+.occ-size{font-size:11px;font-weight:700;color:#d7dafa;background:#28334d;border-radius:6px;padding:4px 8px}
+.occ-card h3{font-size:17px;letter-spacing:-.4px;margin:12px 0 8px}
+.occ-bar{height:5px;border-radius:3px;background:#243049;overflow:hidden;margin-bottom:14px}
+.occ-bar i{display:block;height:100%;background:var(--c)}
+.occ-card ul{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:11.5px;color:#aab9d2}
+.occ-card li b{color:#e4e9f7;font-weight:600}
+.occ-match{display:inline-block;margin-top:12px;font-size:10px;color:#a4f4d5;background:#215346;border-radius:6px;padding:4px 8px}
+@media(max-width:1050px){.occ-grid{grid-template-columns:1fr}}
+</style>
+{% include 'portal/occupation_tabs.html' %}
+
+<section class="occ-groups">
+  <div class="eyebrow small">/ GROUPES</div>
+  <h2>Les 3 profils types</h2>
+  <p>La population active est répartie en 3 profils types. Remplissez le formulaire pour voir de quel profil vous êtes le plus proche.</p>
+  <div class="occ-grid">
+    <article class="occ-card g0{% if result and result.segment == '0' %} is-match{% endif %}">
+      <div class="occ-top"><span class="occ-num">GROUPE 0</span><span class="occ-size">23 %</span></div>
+      <h3>Plus âgés, peu diplômés</h3>
+      <div class="occ-bar"><i style="width:23%"></i></div>
+      <ul><li><b>54 ans</b> en moyenne</li><li><b>8,3 ans</b> d’études (le plus bas)</li><li><b>36 h</b> par semaine · 46 % mariés</li><li><b>9 %</b> de revenu supérieur à 50K</li><li>Profession la plus fréquente : <b>Craft-repair</b></li></ul>
+      {% if result and result.segment == '0' %}<span class="occ-match">✦ Votre groupe</span>{% endif %}
+    </article>
+    <article class="occ-card g1{% if result and result.segment == '1' %} is-match{% endif %}">
+      <div class="occ-top"><span class="occ-num">GROUPE 1</span><span class="occ-size">39 %</span></div>
+      <h3>Jeunes célibataires</h3>
+      <div class="occ-bar"><i style="width:39%"></i></div>
+      <ul><li><b>27 ans</b> en moyenne</li><li><b>75 %</b> jamais mariés · 50 % de femmes</li><li><b>36 h</b> par semaine</li><li><b>2 %</b> de revenu supérieur à 50K</li><li>Profession la plus fréquente : <b>Adm-clerical</b></li></ul>
+      {% if result and result.segment == '1' %}<span class="occ-match">✦ Votre groupe</span>{% endif %}
+    </article>
+    <article class="occ-card g2{% if result and result.segment == '2' %} is-match{% endif %}">
+      <div class="occ-top"><span class="occ-num">GROUPE 2</span><span class="occ-size">38 %</span></div>
+      <h3>Hommes mariés, longues heures</h3>
+      <div class="occ-bar"><i style="width:38%"></i></div>
+      <ul><li><b>42 ans</b> en moyenne</li><li><b>86 %</b> mariés · 9 % de femmes</li><li><b>48 h</b> par semaine · 11,4 ans d’études</li><li><b>56 %</b> de revenu supérieur à 50K</li><li>Profession la plus fréquente : <b>Prof-specialty</b></li></ul>
+      {% if result and result.segment == '2' %}<span class="occ-match">✦ Votre groupe</span>{% endif %}
+    </article>
+  </div>
+</section>

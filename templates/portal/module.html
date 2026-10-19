@@ -4,6 +4,7 @@
 {% block content %}
 <div class="detail-back"><a href="{% url 'portal:home' %}">← Retour à l’espace de travail</a></div>
 <section class="detail-hero accent-{{ module.accent }}"><div class="detail-titleblock"><div class="detail-meta"><span class="detail-tag">{{ module.tag }}</span><span class="detail-divider">/</span><span>{{ module.team }}</span></div><h1>{{ module.title }}<span class="detail-point">.</span></h1><p>{{ module.intro }}</p><div class="detail-tags"><span>Cible · {{ module.target }}</span><span>{{ module.method }}</span></div></div><div class="detail-symbol"><svg class="ico"><use href="#icon-{{ module.icon }}"/></svg></div></section>
+{% if module.slug == 'occupation' %}{% include 'portal/occupation_groups.html' %}{% endif %}
 <div class="detail-layout"><section class="form-panel"><div class="panel-heading"><div><div class="eyebrow small">/ INPUT</div><h2>Parlons de votre profil</h2><p>Complétez les champs pour envoyer une prédiction à ce module.</p></div><span class="step-badge">01 / 02</span></div>
   <form method="post" action="" id="prediction-form" novalidate>
     {% csrf_token %}

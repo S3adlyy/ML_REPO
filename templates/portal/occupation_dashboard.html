@@ -1,0 +1,117 @@
+{% extends 'portal/base.html' %}
+{% block title %}{{ module.title }} · Prisma ML Studio{% endblock %}
+{% block breadcrumb %}{{ module.title }}{% endblock %}
+{% block content %}
+<div class="detail-back"><a href="{% url 'portal:home' %}">← Retour à l’espace de travail</a></div>
+<section class="detail-hero accent-{{ module.accent }}"><div class="detail-titleblock"><div class="detail-meta"><span class="detail-tag">Population</span><span class="detail-divider">/</span><span>{{ module.team }}</span></div><h1>{{ module.title }}<span class="detail-point">.</span></h1><p>Qui sont les personnes de la population active ? Ce tableau de bord présente les trois profils types qui se dégagent de 48 790 personnes, avec leurs statistiques et leur interprétation.</p></div><div class="detail-symbol"><svg class="ico"><use href="#icon-{{ module.icon }}"/></svg></div></section>
+
+{% include 'portal/occupation_tabs.html' %}
+
+<style>
+.dash{margin-top:21px;display:grid;gap:20px}
+.dash .panel{border:1px solid #303c55;border-radius:16px;background:linear-gradient(150deg,#182236,#111a2b);padding:24px}
+.dash h2{font-size:19px;letter-spacing:-.5px;margin:8px 0 4px}
+.dash .sub{color:#91a0b8;font-size:11.5px;margin:0 0 18px;line-height:1.6;max-width:760px}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+.kpi{border:1px solid #303c55;border-radius:14px;background:#121a2b;padding:16px 18px}
+.kpi strong{display:block;font-size:24px;letter-spacing:-1px;color:#d7dafa;line-height:1.1}
+.kpi span{font-size:11px;color:#91a0b8}
+.stack{display:flex;height:42px;border-radius:11px;overflow:hidden;gap:3px;margin:6px 0 10px}
+.stack div{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:750;color:#0b1020;min-width:34px}
+.c-orange{--c:var(--orange)}.c-teal{--c:var(--teal)}.c-violet{--c:var(--violet)}
+.stack div{background:var(--c)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:10.5px;color:#9aa8c2}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:3px;background:var(--c);margin-right:6px}
+.gcards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.gcard{border:1px solid #303c55;border-radius:16px;background:linear-gradient(150deg,#182236,#111a2b);padding:21px;border-top:3px solid var(--c)}
+.gcard .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.gcard .num{font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--c)}
+.gcard .size{font-size:12px;font-weight:750;color:#d7dafa;background:#28334d;border-radius:6px;padding:4px 8px}
+.gcard h3{font-size:17px;letter-spacing:-.4px;margin:12px 0 6px}
+.gcard p{font-size:11.5px;color:#94a3bb;line-height:1.6;margin:0 0 14px;min-height:54px}
+.fig{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.fig div{background:#0f1727;border:1px solid #2a364d;border-radius:10px;padding:10px 8px;text-align:center}
+.fig strong{display:block;font-size:17px;color:#e9edfb;letter-spacing:-.5px}.fig span{font-size:9.5px;color:#7f8fa8}
+.meter{margin-bottom:10px;font-size:10.5px;color:#aab9d2}
+.meter .row{display:flex;justify-content:space-between;margin-bottom:4px}.meter b{color:#e4e9f7}
+.meter .bar{height:6px;border-radius:4px;background:#243049;overflow:hidden}.meter .bar i{display:block;height:100%;background:var(--c)}
+.cmpgrid{display:grid;gap:16px}.cm strong{display:block;font-size:11.5px;color:#d6deed;margin-bottom:6px}.cb{display:grid;grid-template-columns:1fr 78px;align-items:center;gap:10px;margin-bottom:5px}.cb .bar{height:9px;border-radius:5px;background:#243049;overflow:hidden}.cb .bar i{display:block;height:100%;background:var(--c)}.cb em{font-style:normal;font-size:11px;color:#e4e9f7;font-weight:650;text-align:right}
+.two{display:grid;grid-template-columns:1.2fr 1fr;gap:20px}
+.take{display:grid;gap:12px}
+.take div{border-left:3px solid #6e79d8;background:#121b2a;border-radius:0 10px 10px 0;padding:11px 14px}
+.take strong{display:block;font-size:12.5px;color:#e9edfb;margin-bottom:3px}.take span{font-size:11.5px;color:#9fb0c9;line-height:1.6}
+.tbl{overflow-x:auto}
+table.cmp{width:100%;border-collapse:collapse;font-size:11.5px}
+.cmp th,.cmp td{padding:10px 12px;text-align:left;border-bottom:1px solid #26324a;white-space:nowrap}
+.cmp th{color:#8fa0bd;font-size:10px;letter-spacing:1px;font-weight:700}
+.cmp td:first-child{color:#8fa0bd}
+.cmp td.n{color:#e4e9f7;font-weight:600}
+.cmp .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c);margin-right:7px}
+.notes{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.notes ul{margin:0;padding-left:18px;display:grid;gap:8px;font-size:11.5px;color:#9fb0c9;line-height:1.6}
+.cta{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+@media(max-width:1050px){.gcards,.two,.notes{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){</style>
+
+<div class="dash">
+  <div class="kpis">{% for value, label in kpis %}<div class="kpi"><strong>{{ value }}</strong><span>{{ label }}</span></div>{% endfor %}</div>
+
+  <section class="panel">
+    <div class="eyebrow small">/ RÉPARTITION</div>
+    <h2>Comment la population se répartit</h2>
+    <p class="sub">Trois profils types regroupent les personnes dont les caractéristiques se ressemblent.</p>
+    <div class="stack" role="img" aria-label="Taille des profils">{% for g in profiles %}<div class="c-{{ g.color }}" style="width:{{ g.size_w }}%" title="{{ g.name }} · {{ g.size_txt }}">{{ g.size_txt }}</div>{% endfor %}</div>
+    <div class="legend">{% for g in profiles %}<span class="c-{{ g.color }}"><i></i>{{ g.name }}</span>{% endfor %}</div>
+  </section>
+
+  <div class="gcards">
+    {% for g in profiles %}
+    <article class="gcard c-{{ g.color }}">
+      <div class="top"><span class="num">PROFIL {{ forloop.counter }}</span><span class="size">{{ g.size_txt }}</span></div>
+      <h3>{{ g.name }}</h3>
+      <p>{{ g.blurb }}</p>
+      <div class="fig"><div><strong>{{ g.age_txt }}</strong><span>ans en moyenne</span></div><div><strong>{{ g.hours_txt }}</strong><span>h / semaine</span></div><div><strong>{{ g.edu_txt }}</strong><span>ans d’études</span></div></div>
+      <div class="meter"><div class="row"><span>Revenu supérieur à 50K</span><b>{{ g.high }} %</b></div><div class="bar"><i style="width:{{ g.high }}%"></i></div></div>
+      <div class="meter"><div class="row"><span>Femmes</span><b>{{ g.women }} %</b></div><div class="bar"><i style="width:{{ g.women }}%"></i></div></div>
+      <div class="meter"><div class="row"><span>Avec gain de capital</span><b>{{ g.gain }} %</b></div><div class="bar"><i style="width:{{ g.gain }}%"></i></div></div>
+      <div class="meter"><div class="row"><span>Avec perte de capital</span><b>{{ g.loss }} %</b></div><div class="bar"><i style="width:{{ g.loss }}%"></i></div></div>
+    </article>
+    {% endfor %}
+  </div>
+
+  <div class="two">
+    <section class="panel">
+      <div class="eyebrow small">/ LES ÉCARTS</div>
+      <h2>Ce qui distingue les profils</h2>
+      <p class="sub">Les trois profils comparés sur cinq indicateurs.</p>
+      <div class="cmpgrid">{% for m in metrics %}<div class="cm"><strong>{{ m.title }}</strong>{% for b in m.bars %}<div class="cb c-{{ b.color }}"><div class="bar"><i style="width:{{ b.w }}%"></i></div><em>{{ b.txt }}</em></div>{% endfor %}</div>{% endfor %}</div>
+      <div class="legend" style="margin-top:14px">{% for g in profiles %}<span class="c-{{ g.color }}"><i></i>{{ g.name }}</span>{% endfor %}</div>
+    </section>
+    <section class="panel">
+      <div class="eyebrow small">/ INTERPRÉTATION</div>
+      <h2>Ce qu’il faut retenir</h2>
+      <p class="sub">Lecture des statistiques pour la population étudiée.</p>
+      <div class="take">{% for t, d in takeaways %}<div><strong>{{ t }}</strong><span>{{ d }}</span></div>{% endfor %}</div>
+    </section>
+  </div>
+
+  <section class="panel">
+    <div class="eyebrow small">/ PROFILS EN DÉTAIL</div>
+    <h2>Tableau des profils</h2>
+    <div class="tbl"><table class="cmp"><thead><tr><th></th>{% for g in profiles %}<th class="c-{{ g.color }}"><span class="dot"></span>{{ g.name|upper }}</th>{% endfor %}</tr></thead><tbody>
+      <tr><td>Part de la population</td>{% for g in profiles %}<td class="n">{{ g.size_txt }}</td>{% endfor %}</tr>
+      <tr><td>Situation familiale</td>{% for g in profiles %}<td>{{ g.marital }}</td>{% endfor %}</tr>
+      <tr><td>Rôle dans le foyer</td>{% for g in profiles %}<td>{{ g.rel }}</td>{% endfor %}</tr>
+      <tr><td>Catégorie d’emploi</td>{% for g in profiles %}<td>{{ g.work }}</td>{% endfor %}</tr>
+      <tr><td>Profession la plus fréquente</td>{% for g in profiles %}<td>{{ g.occ }}</td>{% endfor %}</tr>
+    </tbody></table></div>
+  </section>
+
+  <section class="panel notes">
+    <div><div class="eyebrow small">/ LIMITES</div><h2>À lire avec prudence</h2>
+      <ul><li>Les chiffres sont des moyennes : une personne peut s’écarter de son profil.</li><li>Les profils se touchent aux frontières : ils décrivent des tendances.</li><li>Données de recensement américain de 1994.</li><li>Un profil décrit un groupe, il ne prédit pas un métier.</li></ul></div>
+    <div class="cta"><div><div class="eyebrow small">/ ET VOUS ?</div><h2>Trouvez votre profil</h2><p class="sub" style="margin-bottom:0">Le second onglet vous rattache au profil le plus proche.</p></div><a class="btn btn-primary" href="{% url 'portal:occupation_profil' %}">Trouver mon groupe <svg class="ico"><use href="#icon-arrow"/></svg></a></div>
+  </section>
+</div>
+
+{% endblock %}
