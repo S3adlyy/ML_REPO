@@ -32,10 +32,31 @@ class PortalSmokeTests(TestCase):
             keys = {f.key for f in module.fields}
             self.assertNotIn(module.target, keys)
             if module.slug == 'age': self.assertNotIn('age', keys)
+            if module.slug == 'has_capital':
+                self.assertNotIn('has_capital', keys)
+                self.assertNotIn('capital_gain', keys)
+                self.assertNotIn('capital_loss', keys)
             if module.slug == 'hours': self.assertNotIn('hours_per_week', keys)
             if module.slug == 'workclass': self.assertNotIn('workclass', keys)
             if module.slug == 'income': self.assertNotIn('income', keys)
             if module.slug == 'occupation': self.assertNotIn('occupation', keys)
+
+    def test_has_capital_features_and_no_leakage(self):
+        keys = {field.key for field in BY_SLUG['has_capital'].fields}
+        self.assertEqual(len(keys), 9)
+        self.assertNotIn('has_capital', keys)
+        self.assertNotIn('capital_gain', keys)
+        self.assertNotIn('capital_loss', keys)
+        self.assertIn('age', keys)
+        self.assertIn('workclass', keys)
+        self.assertIn('education', keys)
+        self.assertIn('occupation', keys)
+        self.assertIn('hours_per_week', keys)
+        self.assertIn('marital_status', keys)
+        self.assertIn('relationship', keys)
+        self.assertIn('income', keys)
+        self.assertIn('native_us', keys)
+
 
     def test_invalid_profile_does_not_call_model(self):
         with patch('portal.views.execute') as execute:
@@ -201,3 +222,49 @@ class RealIncomeModelIntegrationTests(TestCase):
                                data=json.dumps(INCOME_PROFILE), content_type='application/json')
         self.assertEqual(res.status_code, 200)
         self.assertGreater(res.json()['result']['probability'], 0.5)
+
+
+@skipUnless(model_installed('has_capital'), 'Le modèle has_capital n’est pas présent dans le dépôt Git')
+class RealHasCapitalModelIntegrationTests(TestCase):
+    """Test du modèle has_capital réel : s’exécute seulement avec le .joblib présent."""
+
+    def test_real_model_on_web_form(self):
+        payload = {
+            'age': 35, 'education': 'Bachelors', 'workclass': 'Private',
+            'occupation': 'Exec-managerial', 'hours_per_week': 45,
+            'marital_status': 'Married-civ-spouse', 'relationship': 'Husband',
+            'income': '>50K', 'native_us': '1',
+        }
+        response = self.client.post(reverse('portal:module', args=['has_capital']), payload)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(response.context['result'])
+        self.assertIn('label', response.context['result'])
+
+    def test_real_model_on_json_api(self):
+        payload = {
+            'age': 35, 'education': 'Bachelors', 'workclass': 'Private',
+            'occupation': 'Exec-managerial', 'hours_per_week': 45,
+            'marital_status': 'Married-civ-spouse', 'relationship': 'Husband',
+            'income': '>50K', 'native_us': '1',
+        }
+        response = self.client.post(
+            reverse('portal:predict_api', args=['has_capital']),
+            data=json.dumps(payload), content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        result = response.json()['result']
+        self.assertIn('label', result)
+        self.assertIn('probability_capital', result)
+        self.assertAlmostEqual(result['threshold'], 0.685, places=2)
+
+    def test_has_capital_form_rejects_out_of_training_range(self):
+        payload = {
+            'age': 10, 'education': 'Bachelors', 'workclass': 'Private',
+            'occupation': 'Exec-managerial', 'hours_per_week': 45,
+            'marital_status': 'Married-civ-spouse', 'relationship': 'Husband',
+            'income': '>50K', 'native_us': '1',
+        }
+        response = self.client.post(reverse('portal:module', args=['has_capital']), payload)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.context['result'])
+
