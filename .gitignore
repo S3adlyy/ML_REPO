@@ -1,0 +1,32 @@
+# Environnements / secrets
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+.mypy_cache/
+.idea/
+.vscode/
+.DS_Store
+# Database and static assets
+db.sqlite3
+staticfiles/
+media/
+# Datasets et notebooks volumineux
+*.csv
+*.parquet
+*.pkl
+*.pickle
+*.joblib
+*.onnx
+*.h5
+*.hdf5
+*.pt
+*.pth
+*.keras
+*.zip
+# Autoriser les répertoires versionnés vides via .gitkeep

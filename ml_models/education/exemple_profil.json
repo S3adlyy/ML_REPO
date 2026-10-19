@@ -1,0 +1,9 @@
+{
+  "age": 28,
+  "hours-per-week": 40,
+  "capital-gain": 0,
+  "capital-loss": 0,
+  "workclass": "Private",
+  "occupation": "Adm-clerical",
+  "income": "<=50K"
+}

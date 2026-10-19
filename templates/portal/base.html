@@ -1,0 +1,68 @@
+{% load static %}
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c1120">
+  <meta name="description" content="Prisma ML Studio — portail collaboratif de six modèles de machine learning.">
+  <title>{% block title %}Prisma — ML Studio{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'portal/css/app.css' %}">
+  <script src="{% static 'portal/js/app.js' %}" defer></script>
+</head>
+<body>
+<svg aria-hidden="true" class="svg-sprite" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="icon-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
+  <symbol id="icon-wallet" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="15" rx="3"/><path d="M3 9h18M15 15h3"/></symbol>
+  <symbol id="icon-orbit" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="12" rx="10" ry="5" transform="rotate(-35 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="5" transform="rotate(35 12 12)"/></symbol>
+  <symbol id="icon-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v5M17 3v5M3 10h18M8 15h8"/></symbol>
+  <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></symbol>
+  <symbol id="icon-graduation" viewBox="0 0 24 24"><path d="m2 9 10-5 10 5-10 5-10-5Z"/><path d="M6 12v5c4 3 8 3 12 0v-5M22 9v7"/></symbol>
+  <symbol id="icon-briefcase" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13c5 3 13 3 18 0"/></symbol>
+  <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></symbol>
+  <symbol id="icon-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="icon-bolt" viewBox="0 0 24 24"><path d="M13 2 4 13h7l-1 9 10-12h-7l1-8Z"/></symbol>
+  <symbol id="icon-code" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4m8-8 4 4-4 4m-6-11-4 18"/></symbol>
+  <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 2 4 6v6c0 5 3 8 8 10 5-2 8-5 8-10V6l-8-4Z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="icon-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+  <symbol id="icon-x" viewBox="0 0 24 24"><path d="m5 5 14 14M19 5 5 19"/></symbol>
+  <symbol id="icon-search" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></symbol>
+  <symbol id="icon-spark" viewBox="0 0 24 24"><path d="m12 2 2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2Z"/></symbol>
+</svg>
+<div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="{% url 'portal:home' %}" aria-label="Prisma, accueil">
+      <span class="brand-symbol"><span></span><span></span><span></span><span></span></span>
+      <span class="brand-word">prisma<span class="brand-dot">.</span><small>ML STUDIO</small></span>
+    </a>
+    <div class="sidebar-label">ESPACE DE TRAVAIL</div>
+    <a class="nav-link {% if active == 'home' %}is-active{% endif %}" href="{% url 'portal:home' %}"><svg class="ico"><use href="#icon-grid"/></svg><span>Vue d’ensemble</span><svg class="ico ico-end"><use href="#icon-chevron"/></svg></a>
+    <div class="sidebar-label sidebar-label-modules">NOS 6 EXPÉRIENCES <span>06</span></div>
+    <nav aria-label="Modules de l'équipe" class="module-nav">
+      {% for item in sidebar_modules %}
+      <a href="{% url 'portal:module' item.slug %}" class="nav-link {% if active == item.slug %}is-active{% endif %}">
+        <span class="nav-module-ico {{ item.accent }}"><svg class="ico"><use href="#icon-{{ item.icon }}"/></svg></span>
+        <span>{{ item.title }}</span>
+        {% if active == item.slug %}<span class="nav-active-dot"></span>{% endif %}
+      </a>
+      {% endfor %}
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="sidebar-tip"><svg class="ico"><use href="#icon-spark"/></svg><div><strong>Un espace. Six modèles.</strong><p>Une plateforme créée en équipe.</p></div></div>
+      <div class="sidebar-credit"><span class="avatar-mini">ML</span><div><strong>Adult ML · Équipe</strong><small>Projet académique collaboratif</small></div></div>
+    </div>
+  </aside>
+  <div class="main-area">
+    <header class="topbar">
+      <button id="menu-toggle" class="mobile-menu" aria-label="Ouvrir le menu" aria-controls="sidebar" aria-expanded="false"><svg class="ico"><use href="#icon-menu"/></svg></button>
+      <div class="breadcrumbs"><span>Workspace</span><svg class="ico"><use href="#icon-chevron"/></svg><strong>{% block breadcrumb %}Vue d’ensemble{% endblock %}</strong></div>
+      <div class="topbar-right"><span class="topbar-live"><i></i> Projet collaboratif</span><span class="topbar-avatar">ML</span></div>
+    </header>
+    <main class="page-content">{% block content %}{% endblock %}</main>
+    <footer class="site-footer"><span>© 2026 Prisma ML Studio · Projet pédagogique</span><span>Construit pour apprendre, pas pour décider à la place des personnes.</span></footer>
+  </div>
+</div>
+<div id="mobile-backdrop" class="mobile-backdrop" hidden></div>
+</body>
+</html>

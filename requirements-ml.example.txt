@@ -1,0 +1,10 @@
+# À personnaliser selon les versions EXACTES du modèle sérialisé.
+# Modèle education précédent : versions indicatives, à confirmer dans le metadata.
+joblib>=1.5,<2
+pandas>=2.2,<3
+numpy>=2.0,<3
+scikit-learn>=1.7,<1.9
+xgboost>=3.1,<3.2
+# Pour le clustering / boosting éventuel :
+# lightgbm
+# imbalanced-learn

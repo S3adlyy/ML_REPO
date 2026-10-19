@@ -1,0 +1,30 @@
+{
+  "target": "education_2_classes",
+  "label_mapping": {
+    "0": "Niveau non supérieur",
+    "1": "Niveau supérieur"
+  },
+  "features": [
+    "age",
+    "hours-per-week",
+    "capital-gain",
+    "capital-loss",
+    "workclass",
+    "occupation",
+    "income"
+  ],
+  "raw_expected_columns": [
+    "age",
+    "hours-per-week",
+    "capital-gain",
+    "capital-loss",
+    "workclass",
+    "occupation",
+    "income"
+  ],
+  "threshold": 0.52,
+  "model": "XGBoost",
+  "model_is_decision_support_only": true,
+  "data_source": "UCI Adult 48,842 rows historic US census",
+  "training_seed": 42
+}

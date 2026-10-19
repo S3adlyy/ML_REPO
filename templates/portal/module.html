@@ -1,0 +1,26 @@
+{% extends 'portal/base.html' %}
+{% block title %}{{ module.title }} · Prisma ML Studio{% endblock %}
+{% block breadcrumb %}{{ module.title }}{% endblock %}
+{% block content %}
+<div class="detail-back"><a href="{% url 'portal:home' %}">← Retour à l’espace de travail</a></div>
+<section class="detail-hero accent-{{ module.accent }}"><div class="detail-titleblock"><div class="detail-meta"><span class="detail-tag">{{ module.tag }}</span><span class="detail-divider">/</span><span>{{ module.team }}</span></div><h1>{{ module.title }}<span class="detail-point">.</span></h1><p>{{ module.intro }}</p><div class="detail-tags"><span>Cible · {{ module.target }}</span><span>{{ module.method }}</span></div></div><div class="detail-symbol"><svg class="ico"><use href="#icon-{{ module.icon }}"/></svg></div></section>
+<div class="detail-layout"><section class="form-panel"><div class="panel-heading"><div><div class="eyebrow small">/ INPUT</div><h2>Parlons de votre profil</h2><p>Complétez les champs pour envoyer une prédiction à ce module.</p></div><span class="step-badge">01 / 02</span></div>
+  <form method="post" action="" id="prediction-form" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="form-alert">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="fields-grid">{% for field in form %}<div class="field-group"><label for="{{ field.id_for_label }}">{{ field.label }} <span class="required">*</span></label>{{ field }}{% if field.help_text %}<small class="help-text">{{ field.help_text }}</small>{% endif %}{% for error in field.errors %}<small class="field-error">{{ error }}</small>{% endfor %}</div>{% endfor %}</div>
+    <div class="form-footer"><span><svg class="ico"><use href="#icon-shield"/></svg> Profil traité sans enregistrement en base</span><button type="submit" class="btn btn-primary">Lancer l’analyse <svg class="ico"><use href="#icon-arrow"/></svg></button></div>
+  </form>
+</section>
+<aside class="result-column"><div class="result-panel" id="result-panel"><div class="eyebrow small">/ OUTPUT</div><h2>Résultat de l’analyse</h2>
+ {% if result %}<div class="result-icon success">✦</div><div class="result-caption">Résultat estimé</div><div class="result-main">{{ result.label }}</div>
+ {% if result.value != None %}<p class="result-note">{{ result.value }} {{ result.unit|default:'' }}</p>{% endif %}
+ {% if result.probability_superior != None %}<p class="result-note">Score « niveau supérieur » : {% widthratio result.probability_superior 1 100 %} % <span class="result-disclaimer">(score à interpréter avec prudence)</span></p>{% endif %}
+ <p class="result-note">{{ result.note }}</p><span class="result-kind">Analyse terminée · indicative</span>
+ {% elif warning %}<div class="result-icon pending">!</div><div class="result-main result-warning">Module non disponible</div><p class="result-note">{{ warning }}</p><span class="result-kind">Ajouter le pipeline avant la prédiction</span>
+ {% else %}<div class="result-placeholder"><div class="empty-orb"><svg class="ico"><use href="#icon-bolt"/></svg></div><strong>Prêt à explorer</strong><p>Votre résultat s'affichera ici après l'envoi du formulaire, dès que le membre aura connecté son modèle.</p></div>{% endif %}
+</div>
+<div class="info-panel"><div class="info-heading"><svg class="ico"><use href="#icon-code"/></svg><strong>Connexion du modèle</strong></div><span class="integration-state {% if installed %}ready{% endif %}"><i></i>{% if installed %}Fichier .joblib présent{% else %}En attente du .joblib{% endif %}</span><code>ml_models/{{ module.slug }}/pipeline.joblib</code><p>{{ module.note }}</p></div>
+<div class="privacy-note"><svg class="ico"><use href="#icon-shield"/></svg><span>Les résultats sont expérimentaux et ne doivent pas servir de décision automatique sur une personne.</span></div>
+</aside></div>
+{% endblock %}

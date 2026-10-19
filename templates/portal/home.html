@@ -1,0 +1,28 @@
+{% extends 'portal/base.html' %}
+{% block title %}Accueil · Prisma ML Studio{% endblock %}
+{% block content %}
+<section class="hero" aria-labelledby="hero-heading">
+  <div class="hero-copy"><div class="eyebrow"><span class="eyebrow-line"></span> ESPACE DE MACHINE LEARNING <span class="eyebrow-spark">✦</span></div>
+    <h1 id="hero-heading">Une équipe.<br><em>Six visions</em> de la donnée.</h1>
+    <p>Explorez six approches complémentaires de machine learning dans une plateforme unique. Chaque membre connecte son modèle, toute l’équipe partage la même expérience.</p>
+    <div class="hero-actions"><a href="#explorer" class="btn btn-primary">Explorer les modèles <svg class="ico"><use href="#icon-arrow"/></svg></a><a href="#architecture" class="btn btn-outline">Comment ça fonctionne</a></div>
+  </div>
+  <div class="hero-art" aria-hidden="true"><div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div><div class="hero-orbit orbit-three"></div><div class="hero-core"><span>ML</span><small>6 × 1</small></div><span class="floating-particle particle-one"></span><span class="floating-particle particle-two"></span><span class="floating-particle particle-three"></span><div class="hero-art-label label-top">PREDICT<span> / 01</span></div><div class="hero-art-label label-bottom">PATTERNS<span> / 06</span></div></div>
+</section>
+<section class="quick-stats" aria-label="Chiffres du projet"><div><strong>06</strong><span>Modules ML</span></div><div><strong>01</strong><span>Interface commune</span></div><div><strong>03</strong><span>Types d'apprentissage</span></div><div class="stats-last"><span class="pulse"></span><span>Projet évolutif</span></div></section>
+<section id="explorer" class="section-grid">
+ <div class="section-heading"><div><div class="eyebrow small">/ EXPLORER</div><h2>Choisissez votre <span>expérience.</span></h2><p>Six modules indépendants, une identité visuelle commune.</p></div><span class="section-counter">01 / 02</span></div>
+ <div class="toolbar"><div class="search-box"><svg class="ico"><use href="#icon-search"/></svg><input id="module-search" type="search" placeholder="Rechercher un modèle, une cible..." aria-label="Rechercher un module"></div><div class="filter-tabs" aria-label="Filtrer les modules"><button type="button" class="filter-tab active" data-filter="all" aria-pressed="true">Tous <span>06</span></button><button type="button" class="filter-tab" data-filter="Supervisé" aria-pressed="false">Supervisé</button><button type="button" class="filter-tab" data-filter="Non supervisé" aria-pressed="false">Clustering</button></div></div>
+ <div class="module-grid" id="module-grid">
+ {% for entry in modules %}{% with m=entry.spec %}
+ <article class="module-card accent-{{ m.accent }}" data-name="{{ m.title|lower }} {{ m.target|lower }} {{ m.intro|lower }}" data-method="{{ m.method }}">
+  <div class="module-card-top"><div class="card-icon"><svg class="ico"><use href="#icon-{{ m.icon }}"/></svg></div><span class="card-status {% if entry.installed %}ready{% endif %}"><i></i>{% if entry.installed %}Pipeline disponible{% else %}À connecter{% endif %}</span></div>
+  <div class="card-number">/ 0{{ forloop.counter }} <span>— {{ m.tag }}</span></div>
+  <h3>{{ m.title }}</h3><p>{{ m.intro }}</p>
+  <div class="card-foot"><span class="card-target">Cible : <b>{{ m.target }}</b></span><a class="card-link" href="{% url 'portal:module' m.slug %}" aria-label="Explorer {{ m.title }}"><svg class="ico"><use href="#icon-arrow"/></svg></a></div>
+ </article>
+ {% endwith %}{% endfor %}
+ </div><p class="no-results" id="no-results" hidden>Aucun modèle ne correspond à votre recherche.</p>
+</section>
+<section id="architecture" class="how-section"><div><div class="eyebrow small">/ NOTRE MÉTHODE</div><h2>Un flux simple.<br><span>De la donnée à la décision éclairée.</span></h2><p>Chaque module peut évoluer à son rythme, sans bloquer ceux de l’équipe.</p></div><div class="how-steps"><div><span>01</span><div><strong>Choisir un module</strong><small>Classification, régression ou clustering</small></div></div><div><span>02</span><div><strong>Renseigner son profil</strong><small>Formulaire adapté au pipeline du membre</small></div></div><div><span>03</span><div><strong>Interpréter une estimation</strong><small>Vérifier le résultat et ses limites</small></div></div></div></section>
+{% endblock %}
