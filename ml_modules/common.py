@@ -11,7 +11,7 @@ class ModelNotReady(RuntimeError):
     pass
 
 def model_path(slug):
-    if slug not in {'income', 'occupation', 'age', 'hours', 'education', 'workclass'}:
+    if slug not in {'income', 'occupation', 'age', 'has_capital', 'hours', 'education', 'workclass'}:
         raise ValueError('Module inconnu')
     return MODEL_ROOT / slug / 'pipeline.joblib'
 
