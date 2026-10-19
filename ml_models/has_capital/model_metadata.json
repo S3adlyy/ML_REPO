@@ -1,0 +1,55 @@
+{
+  "target": "has_capital",
+  "target_description": "Propension à détenir des actifs ou déclarer des gains/pertes de capital (1 = oui, 0 = non)",
+  "label_mapping": {
+    "0": "Aucun capital significatif déclaré (has_capital = 0)",
+    "1": "Détention de capital probable (has_capital = 1)"
+  },
+  "features": [
+    "age",
+    "workclass",
+    "education-num",
+    "marital-status",
+    "occupation",
+    "relationship",
+    "hours-per-week",
+    "income",
+    "native_us"
+  ],
+  "raw_expected_columns": [
+    "age",
+    "workclass",
+    "education-num",
+    "marital-status",
+    "occupation",
+    "relationship",
+    "hours-per-week",
+    "income",
+    "native_us"
+  ],
+  "threshold": 0.685,
+  "model": "HistGradientBoostingClassifier",
+  "class_weight": "balanced",
+  "imbalance_technique": "Class Weight (retenue après comparaison de 5 techniques)",
+  "leakage_prevention": [
+    "capital-gain exclu",
+    "capital-loss exclu",
+    "log_capital_gain exclu",
+    "log_capital_loss exclu"
+  ],
+  "sensitive_features_removed": [
+    "race",
+    "sex"
+  ],
+  "metrics_test": {
+    "pr_auc": 0.316,
+    "roc_auc": 0.742,
+    "accuracy": 0.81,
+    "recall": 0.5,
+    "precision": 0.341,
+    "lift_top_10_percent": 2.92
+  },
+  "model_is_decision_support_only": true,
+  "author": "Bilal El Eter (Membre 03)",
+  "training_seed": 42
+}

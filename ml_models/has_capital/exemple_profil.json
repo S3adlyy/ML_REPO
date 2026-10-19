@@ -1,0 +1,11 @@
+{
+  "age": 35,
+  "education": "Bachelors",
+  "workclass": "Private",
+  "occupation": "Exec-managerial",
+  "hours_per_week": 45,
+  "marital_status": "Married-civ-spouse",
+  "relationship": "Husband",
+  "income": ">50K",
+  "native_us": "1"
+}
