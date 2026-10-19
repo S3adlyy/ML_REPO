@@ -61,8 +61,25 @@ def income(): return FieldSpec('income','Revenu annuel (catégorie UCI)','select
 def relationship(): return FieldSpec('relationship','Lien familial / foyer','select',choices=RELATIONSHIP)
 def native_us(): return FieldSpec('native_us','Origine géographique','select',choices=NATIVE_US)
 
+# --- Module income (Membre 01) : champs alignés sur le pipeline XGBoost ---------
+# 8 variables brutes du modèle ; sex, race et marital-status volontairement absents.
+INCOME_EDUCATION = (('Preschool','Maternelle / aucune scolarité'), ('1st-4th','Primaire (1re–4e)'), ('5th-6th','Primaire (5e–6e)'), ('7th-8th','Collège (7e–8e)'), ('9th','9e année'), ('10th','10e année'), ('11th','11e année'), ('12th','12e année sans diplôme'), ('HS-grad','Bac / lycée'), ('Some-college','Études supérieures non diplômantes'), ('Assoc-voc','Diplôme intermédiaire professionnel'), ('Assoc-acdm','Diplôme intermédiaire académique'), ('Bachelors','Licence'), ('Masters','Master'), ('Prof-school','École professionnelle (médecine, droit…)'), ('Doctorate','Doctorat'))
+INCOME_RELATIONSHIP = (('Husband','Époux'), ('Wife','Épouse'), ('Own-child','Enfant du foyer'), ('Not-in-family','Hors famille (vit seul·e / colocation)'), ('Unmarried','Non marié(e), avec personnes à charge'), ('Other-relative','Autre membre de la famille'))
+
+def income_fields():
+    return (
+        FieldSpec('age','Âge','integer','Ex. 38','Âge en années (17–90)',minimum=17,maximum=90),
+        FieldSpec('education','Niveau d’études','select', choices=INCOME_EDUCATION),
+        FieldSpec('workclass','Catégorie d’emploi','select', choices=WORKCLASS),
+        FieldSpec('occupation','Profession','select', choices=OCCUPATION),
+        FieldSpec('relationship','Rôle dans le foyer','select', help='Situation dans le foyer telle que déclarée au recensement', choices=INCOME_RELATIONSHIP),
+        FieldSpec('hours_per_week','Heures travaillées / semaine','integer','Ex. 40','Entre 1 et 99 heures',minimum=1,maximum=99),
+        FieldSpec('capital_gain','Gains en capital (USD)','decimal','Ex. 0','Entre 0 et 99 999 USD (plage des données)',minimum=0,maximum=99999),
+        FieldSpec('capital_loss','Pertes en capital (USD)','decimal','Ex. 0','Entre 0 et 4 356 USD (plage des données)',minimum=0,maximum=4356),
+    )
+
 MODULES = (
-    ModuleSpec('income', 'Prédiction du revenu', 'Classification', 'Étudier la catégorie de revenu à partir du profil socio-professionnel.', 'income','Supervisé','wallet','violet','Membre 01', (age(), edu(), work(), job(), hours(), gain(), loss()), 'Choix de champs provisoire ; à aligner avec les features du modèle.'),
+    ModuleSpec('income', 'Prédiction du revenu', 'Classification binaire', 'Estimer si une personne gagne plus de 50 000 USD par an à partir de son profil socio-professionnel.', 'income','Supervisé','wallet','violet','Membre 01', income_fields(), 'Pipeline XGBoost réglé (8 variables brutes, seuil issu de model_metadata.json). Sexe, origine et situation maritale ne sont pas utilisés. Données du recensement américain de 1994 : résultat indicatif, non décisionnel.'),
     ModuleSpec('occupation', 'Segmentation des profils', 'Clustering', 'Identifier des groupes de profils proches pour analyser la population active.', 'occupation (interprétation)', 'Non supervisé','orbit','teal','Membre 02', (age(), edu(), work(), hours(), marital()), 'Le clustering ne prédit pas la profession : occupation sert seulement à interpréter les segments.'),
     ModuleSpec('has_capital', 'Propension au capital', 'Classification binaire', 'Estimer la probabilité qu’un individu dispose de revenus ou pertes de capital.', 'has_capital','Supervisé','spark','orange','Bilal El Eter (Membre 03)', (age(), edu(), work(), job(), hours(), marital(), relationship(), income(), native_us()), 'Modèle HistGradientBoosting avec pondération des classes. Fuite évitée : exclusion stricte de capital-gain et capital-loss. Seuil optimal calibré à 0.685.'),
     ModuleSpec('hours', 'Temps de travail', 'Régression', 'Estimer le volume hebdomadaire de travail selon le profil.', 'hours-per-week','Supervisé','clock','blue','Membre 04', (age(), edu(), work(), job(), marital()), 'Le temps de travail est la variable cible et ne figure pas dans le formulaire.'),
