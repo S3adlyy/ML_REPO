@@ -1,0 +1,11 @@
+<style>
+.occ-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-top:21px;background:#151e31;border:1px solid #28344a;border-radius:12px;padding:5px;width:max-content;max-width:100%}
+.occ-tab{display:block;padding:9px 15px;border-radius:8px;font-size:12px;font-weight:650;color:#8895ae}
+.occ-tab small{display:block;font-size:10px;font-weight:500;color:#6b7893}
+.occ-tab:hover{color:#fff}
+.occ-tab.active{background:#303b55;color:#fff}.occ-tab.active small{color:#a3b5f8}
+</style>
+<nav class="occ-tabs" aria-label="Pages du module">
+  <a class="occ-tab{% if occ_variant == 'vue' %} active{% endif %}" href="{% url 'portal:occupation_dashboard' %}"{% if occ_variant == 'vue' %} aria-current="page"{% endif %}>Vue d’ensemble<small>La population</small></a>
+  <a class="occ-tab{% if occ_variant == 'profil' %} active{% endif %}" href="{% url 'portal:occupation_profil' %}"{% if occ_variant == 'profil' %} aria-current="page"{% endif %}>Trouver mon groupe<small>Mon profil</small></a>
+</nav>
