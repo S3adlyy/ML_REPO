@@ -77,14 +77,35 @@ def income_fields():
         FieldSpec('capital_gain','Gains en capital (USD)','decimal','Ex. 0','Entre 0 et 99 999 USD (plage des données)',minimum=0,maximum=99999),
         FieldSpec('capital_loss','Pertes en capital (USD)','decimal','Ex. 0','Entre 0 et 4 356 USD (plage des données)',minimum=0,maximum=4356),
     )
+# --- Module workclass (Membre 06) : 12 variables brutes du pipeline Random Forest ---
+# education-num est calculé dans l'adapter à partir de education. La cible workclass est absente.
+WC_MARITAL = (('Never-married','Célibataire'), ('Married-civ-spouse','Marié(e)'), ('Married-spouse-absent','Marié(e), conjoint absent'), ('Married-AF-spouse','Marié(e) à un militaire'), ('Divorced','Divorcé(e)'), ('Separated','Séparé(e)'), ('Widowed','Veuf / veuve'))
+WC_RACE = (('White','Blanc'), ('Black','Noir'), ('Asian-Pac-Islander','Asiatique / îles du Pacifique'), ('Amer-Indian-Eskimo','Amérindien / Esquimau'), ('Other','Autre'))
+WC_SEX = (('Male','Homme'), ('Female','Femme'))
+WC_COUNTRY = (('United-States','États-Unis'), ('Mexico','Mexique'), ('Philippines','Philippines'), ('Germany','Allemagne'), ('Canada','Canada'), ('Puerto-Rico','Porto Rico'), ('El-Salvador','Salvador'), ('India','Inde'), ('Cuba','Cuba'), ('England','Angleterre'), ('Jamaica','Jamaïque'), ('China','Chine'), ('Unknown','Autre / non renseigné'))
 
+def workclass_fields():
+    return (
+        age(),
+        FieldSpec('education','Niveau d’études','select', choices=INCOME_EDUCATION),
+        FieldSpec('marital_status','Situation familiale','select', choices=WC_MARITAL),
+        job(),
+        relationship(),
+        FieldSpec('race','Origine ethnique (catégorie UCI)','select', choices=WC_RACE),
+        FieldSpec('sex','Sexe','select', choices=WC_SEX),
+        gain(),
+        loss(),
+        hours(),
+        FieldSpec('native_country','Pays d’origine','select', choices=WC_COUNTRY),
+        income(),
+    )
 MODULES = (
     ModuleSpec('income', 'Prédiction du revenu', 'Classification binaire', 'Estimer si une personne gagne plus de 50 000 USD par an à partir de son profil socio-professionnel.', 'income','Supervisé','wallet','violet','Membre 01', income_fields(), 'Pipeline XGBoost réglé (8 variables brutes, seuil issu de model_metadata.json). Sexe, origine et situation maritale ne sont pas utilisés. Données du recensement américain de 1994 : résultat indicatif, non décisionnel.'),
     ModuleSpec('occupation', 'Segmentation des profils', 'Clustering', 'Identifier des groupes de profils proches pour analyser la population active.', 'occupation (interprétation)', 'Non supervisé','orbit','teal','Membre 02', (age(), edu(), work(), hours(), marital()), 'Le clustering ne prédit pas la profession : occupation sert seulement à interpréter les segments.'),
     ModuleSpec('has_capital', 'Propension au capital', 'Classification binaire', 'Estimer la probabilité qu’un individu dispose de revenus ou pertes de capital.', 'has_capital','Supervisé','spark','orange','Bilal El Eter (Membre 03)', (age(), edu(), work(), job(), hours(), marital(), relationship(), income(), native_us()), 'Modèle HistGradientBoosting avec pondération des classes. Fuite évitée : exclusion stricte de capital-gain et capital-loss. Seuil optimal calibré à 0.685.'),
     ModuleSpec('hours', 'Temps de travail', 'Régression', 'Estimer le volume hebdomadaire de travail selon le profil.', 'hours-per-week','Supervisé','clock','blue','Membre 04', (age(), edu(), work(), job(), marital()), 'Le temps de travail est la variable cible et ne figure pas dans le formulaire.'),
     ModuleSpec('education', 'Niveau d’études', 'Classification binaire', 'Estimer niveau supérieur / niveau non supérieur pour suggérer une orientation initiale.', 'education (2 classes)','Supervisé','graduation','pink','Membre 05', (age(), hours(), gain(), loss(), work(), job(), income()), 'Formulaire compatible avec les sept variables brutes du pipeline XGBoost. Revenu : seuil historique américain en USD ; ce résultat ne vérifie aucun diplôme. À confirmer par l’utilisateur.'),
-    ModuleSpec('workclass', 'Catégorie professionnelle', 'Classification', 'Estimer la catégorie d’emploi selon le profil socio-professionnel.', 'workclass','Supervisé','briefcase','lime','Membre 06', (age(), edu(), job(), hours(), marital()), 'Les caractéristiques sont provisoires : adapter au pipeline du membre 06.'),
+    ModuleSpec('workclass', 'Catégorie professionnelle', 'Classification multiclasse', 'Estimer la catégorie d’emploi selon le profil socio-professionnel.', 'workclass (5 classes)','Supervisé','briefcase','lime','Walid Trojette (Membre 06)', workclass_fields(), 'Random Forest sur 5 classes : Private, Government, Self-employed, Unknown, Other (Without-pay et Never-worked regroupées, ce qui mélange deux situations différentes). Données du recensement américain de 1994 : résultat indicatif, non décisionnel.'),
 )
 
 
