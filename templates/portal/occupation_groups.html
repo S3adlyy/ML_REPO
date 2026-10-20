@@ -16,34 +16,64 @@
 .occ-card li b{color:#e4e9f7;font-weight:600}
 .occ-match{display:inline-block;margin-top:12px;font-size:10px;color:#a4f4d5;background:#215346;border-radius:6px;padding:4px 8px}
 @media(max-width:1050px){.occ-grid{grid-template-columns:1fr}}
+.occ-reco{margin-top:21px;border:1px solid #3b4b72;border-radius:16px;background:linear-gradient(150deg,#1b2742,#121b2d);padding:24px}
+.occ-reco h2{font-size:21px;letter-spacing:-.55px;margin:8px 0 4px}
+.occ-reco .sl{color:#a3b5f8;font-size:12px;margin:0 0 18px}
+.rc-cols{display:grid;grid-template-columns:1fr 1.5fr;gap:20px}
+.rc-box{border:1px solid #303c55;border-radius:12px;background:#111a2b;padding:16px}
+.rc-box h3{font-size:13px;margin:0 0 10px;color:#e9edfb}
+.rc-row{display:grid;grid-template-columns:1fr auto;gap:2px 12px;font-size:11.5px;padding:7px 0;border-bottom:1px solid #26324a;color:#aab9d2}
+.rc-row:last-of-type{border-bottom:0}.rc-row b{color:#e4e9f7}.rc-row small{grid-column:1/-1;color:#7f8fa8;font-size:10px}
+.rc-gap{margin:12px 0 0;font-size:11.5px;line-height:1.6;color:#d3dcf2;background:#223052;border-radius:9px;padding:10px 12px}
+.rc-pistes{display:grid;gap:10px}
+.rc-piste{border-left:3px solid var(--c);background:#121b2a;border-radius:0 10px 10px 0;padding:11px 14px}
+.rc-piste strong{display:block;font-size:12.5px;color:#e9edfb;margin-bottom:3px}
+.rc-piste span{display:block;font-size:11.5px;color:#9fb0c9;line-height:1.6}
+.rc-piste em{display:block;font-style:normal;font-size:10.5px;color:#7f8fa8;margin-top:6px}
+.rc-warn{margin:16px 0 0;font-size:10.5px;color:#8393aa}
+@media(max-width:1050px){.rc-cols{grid-template-columns:1fr}}
 </style>
 {% include 'portal/occupation_tabs.html' %}
 
 <section class="occ-groups">
-  <div class="eyebrow small">/ GROUPES</div>
+  <div class="eyebrow small">/ PROFILS</div>
   <h2>Les 3 profils types</h2>
-  <p>La population active est répartie en 3 profils types. Remplissez le formulaire pour voir de quel profil vous êtes le plus proche.</p>
+  <p>La population active est répartie en 3 profils. Remplissez le formulaire pour voir de quel profil vous êtes le plus proche et recevoir des pistes d’orientation.</p>
   <div class="occ-grid">
     <article class="occ-card g0{% if result and result.segment == '0' %} is-match{% endif %}">
-      <div class="occ-top"><span class="occ-num">GROUPE 0</span><span class="occ-size">23 %</span></div>
-      <h3>Plus âgés, peu diplômés</h3>
+      <div class="occ-top"><span class="occ-num">PROFIL 1</span><span class="occ-size">23 %</span></div>
+      <h3>Les Expérimentés</h3>
       <div class="occ-bar"><i style="width:23%"></i></div>
-      <ul><li><b>54 ans</b> en moyenne</li><li><b>8,3 ans</b> d’études (le plus bas)</li><li><b>36 h</b> par semaine · 46 % mariés</li><li><b>9 %</b> de revenu supérieur à 50K</li><li>Profession la plus fréquente : <b>Craft-repair</b></li></ul>
-      {% if result and result.segment == '0' %}<span class="occ-match">✦ Votre groupe</span>{% endif %}
+      <ul><li>Beaucoup d’années de métier, des études plus courtes</li><li><b>53 ans</b> en moyenne · <b>8,3 ans</b> d’études</li><li><b>36 h</b> par semaine · 46 % mariés</li><li><b>9 %</b> de revenu supérieur à 50K</li></ul>
+      {% if result and result.segment == '0' %}<span class="occ-match">✦ Votre profil</span>{% endif %}
     </article>
     <article class="occ-card g1{% if result and result.segment == '1' %} is-match{% endif %}">
-      <div class="occ-top"><span class="occ-num">GROUPE 1</span><span class="occ-size">39 %</span></div>
-      <h3>Jeunes célibataires</h3>
+      <div class="occ-top"><span class="occ-num">PROFIL 2</span><span class="occ-size">39 %</span></div>
+      <h3>Les Nouveaux Départs</h3>
       <div class="occ-bar"><i style="width:39%"></i></div>
-      <ul><li><b>27 ans</b> en moyenne</li><li><b>75 %</b> jamais mariés · 50 % de femmes</li><li><b>36 h</b> par semaine</li><li><b>2 %</b> de revenu supérieur à 50K</li><li>Profession la plus fréquente : <b>Adm-clerical</b></li></ul>
-      {% if result and result.segment == '1' %}<span class="occ-match">✦ Votre groupe</span>{% endif %}
+      <ul><li>Jeunes, en début de parcours, souvent célibataires</li><li><b>27 ans</b> en moyenne · <b>9,8 ans</b> d’études</li><li><b>36 h</b> par semaine · 75 % jamais mariés</li><li><b>2 %</b> de revenu supérieur à 50K</li></ul>
+      {% if result and result.segment == '1' %}<span class="occ-match">✦ Votre profil</span>{% endif %}
     </article>
     <article class="occ-card g2{% if result and result.segment == '2' %} is-match{% endif %}">
-      <div class="occ-top"><span class="occ-num">GROUPE 2</span><span class="occ-size">38 %</span></div>
-      <h3>Hommes mariés, longues heures</h3>
+      <div class="occ-top"><span class="occ-num">PROFIL 3</span><span class="occ-size">38 %</span></div>
+      <h3>Les Bâtisseurs</h3>
       <div class="occ-bar"><i style="width:38%"></i></div>
-      <ul><li><b>42 ans</b> en moyenne</li><li><b>86 %</b> mariés · 9 % de femmes</li><li><b>48 h</b> par semaine · 11,4 ans d’études</li><li><b>56 %</b> de revenu supérieur à 50K</li><li>Profession la plus fréquente : <b>Prof-specialty</b></li></ul>
-      {% if result and result.segment == '2' %}<span class="occ-match">✦ Votre groupe</span>{% endif %}
+      <ul><li>Carrière installée, longues semaines, revenus élevés</li><li><b>42 ans</b> en moyenne · <b>11,4 ans</b> d’études</li><li><b>48 h</b> par semaine · 86 % mariés</li><li><b>56 %</b> de revenu supérieur à 50K</li></ul>
+      {% if result and result.segment == '2' %}<span class="occ-match">✦ Votre profil</span>{% endif %}
     </article>
   </div>
 </section>
+{% if result and result.reco %}{% with r=result.reco %}
+<section class="occ-reco c-{{ result.segment }}" style="--c:{% if result.segment == '0' %}var(--orange){% elif result.segment == '1' %}var(--teal){% else %}var(--violet){% endif %}">
+  <div class="eyebrow small">/ RECOMMANDATIONS</div>
+  <h2>Vous êtes proche du profil « {{ r.nom }} »</h2>
+  <p class="sl">{{ r.slogan }} · {{ r.taille }} de la population</p>
+  <div class="rc-cols">
+    <div class="rc-box"><h3>Vous et votre profil</h3>
+      {% for c in r.comparaisons %}<div class="rc-row"><span>{{ c.label }}</span><b>{{ c.vous }}</b><small>Moyenne du profil : {{ c.moyenne }} · {{ c.sens }}</small></div>{% endfor %}
+      <p class="rc-gap">{{ r.ecart }}</p></div>
+    <div class="rc-pistes">{% for p in r.pistes %}<div class="rc-piste"><strong>{{ p.titre }}</strong><span>{{ p.texte }}</span><em>Pourquoi : {{ p.preuve }}</em></div>{% endfor %}</div>
+  </div>
+  <p class="rc-warn">{{ r.avertissement }}</p>
+</section>
+{% endwith %}{% endif %}

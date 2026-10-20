@@ -24,15 +24,18 @@ def _f(x):
 
 # Profils types de la population (résultats du notebook, 48 790 personnes).
 PROFILES = [
-    dict(name='Jeunes, majorité jamais mariés', color='teal', size=45.5, age=28.3, hours=36.3, edu=9.4, women=43, high=5, gain=1, loss=0,
+    dict(name='Les Jeunes Pousses', color='teal', size=45.5, age=28.3, hours=36.3, edu=9.4, women=43, high=5, gain=1, loss=0,
          marital='Never-married (61 %)', rel='Not-in-family (32 %)', work='Private (78 %)', occ='Adm-clerical (15 %)',
-         blurb='Personnes jeunes, souvent célibataires, avec peu de hauts revenus.'),
-    dict(name='Plus âgés, majorité mariés', color='violet', size=49.8, age=47.8, hours=44.0, edu=10.6, women=25, high=39, gain=16, loss=0,
+         blurb='Jeunes, souvent célibataires, au début de leur parcours : peu de hauts revenus pour l’instant.',
+         pistes=[('Se former tôt', 'Les Piliers ont 1,2 an d’études de plus (10,6 contre 9,4) et 39 % gagnent plus de 50K, contre 5 % ici.'), ('Explorer plusieurs secteurs', 'Les postes les plus fréquents (Adm-clerical) sont un point de départ : stages et missions variées aident à trouver sa voie.')]),
+    dict(name='Les Piliers', color='violet', size=49.8, age=47.8, hours=44.0, edu=10.6, women=25, high=39, gain=16, loss=0,
          marital='Married-civ-spouse (67 %)', rel='Husband (61 %)', work='Private (62 %)', occ='Exec-managerial (18 %)',
-         blurb='Personnes plus âgées, mariées, qui travaillent plus et gagnent davantage.'),
-    dict(name='Pertes de capital', color='orange', size=4.7, age=41.8, hours=43.3, edu=11.0, women=24, high=50, gain=0, loss=100,
+         blurb='Personnes plus âgées, mariées, au cœur de l’emploi : elles travaillent plus et gagnent davantage.',
+         pistes=[('Entretenir ses compétences', 'À 44 h par semaine en moyenne, la formation continue aide à garder une longueur d’avance.'), ('Préserver l’équilibre de vie', 'Ce profil travaille 8 h de plus par semaine que Les Jeunes Pousses (44 h contre 36 h).')]),
+    dict(name='Les Investisseurs', color='orange', size=4.7, age=41.8, hours=43.3, edu=11.0, women=24, high=50, gain=0, loss=100,
          marital='Married-civ-spouse (62 %)', rel='Husband (55 %)', work='Private (65 %)', occ='Exec-managerial (20 %)',
-         blurb='Petit groupe : toutes les personnes déclarent une perte de capital, et un sur deux gagne plus de 50K.'),
+         blurb='Petit groupe : toutes les personnes déclarent une perte de capital, et une sur deux gagne plus de 50K.',
+         pistes=[('Se faire conseiller', 'Un conseil financier indépendant aide à limiter les risques et à garder une vue d’ensemble (information générale, pas un conseil financier).'), ('Suivre ses opérations', 'Garder une trace claire de ses gains et pertes facilite la déclaration et la prise de décision.')]),
 ]
 for _p in PROFILES:
     _p.update(size_txt=_f(_p['size']) + ' %', age_txt=_f(_p['age']), hours_txt=_f(_p['hours']), edu_txt=_f(_p['edu']), size_w=str(_p['size']))
@@ -48,11 +51,11 @@ KPIS = [('48 790', 'personnes étudiées'), ('≈ 38,6 ans', 'âge moyen'), ('�
         ('≈ 24 %', 'gagnent plus de 50K'), ('≈ 33 %', 'de femmes')]
 
 TAKEAWAYS = [
-    ('Deux grandes moitiés', 'La population se partage presque à égalité entre des personnes jeunes (45,5 %, 28 ans en moyenne) et des personnes plus âgées (49,8 %, 48 ans).'),
+    ('Deux grandes moitiés', 'La population se partage presque à égalité entre Les Jeunes Pousses (45,5 %, 28 ans en moyenne) et Les Piliers (49,8 %, 48 ans).'),
     ('Le revenu monte avec l’âge et la vie de famille', '39 % des plus âgés, majoritairement mariés, gagnent plus de 50K, contre 5 % des plus jeunes.'),
     ('Les plus âgés travaillent plus', '44 heures par semaine en moyenne, contre 36 heures pour les plus jeunes.'),
     ('Les femmes sont plus présentes chez les jeunes', '43 % de femmes dans le groupe des jeunes, contre 25 % chez les plus âgés.'),
-    ('Le capital concerne une minorité', 'Seuls 4,7 % déclarent une perte de capital et environ 8 % un gain : ces personnes ont les revenus les plus élevés.'),
+    ('Le capital concerne une minorité', 'Seuls 4,7 % (Les Investisseurs) déclarent une perte de capital et environ 8 % un gain : ces personnes ont les revenus les plus élevés.'),
 ]
 
 
