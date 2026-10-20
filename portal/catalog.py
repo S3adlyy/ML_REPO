@@ -77,6 +77,28 @@ def income_fields():
         FieldSpec('capital_gain','Gains en capital (USD)','decimal','Ex. 0','Entre 0 et 99 999 USD (plage des données)',minimum=0,maximum=99999),
         FieldSpec('capital_loss','Pertes en capital (USD)','decimal','Ex. 0','Entre 0 et 4 356 USD (plage des données)',minimum=0,maximum=4356),
     )
+# --- Module workclass (Membre 06) : 12 variables brutes du pipeline Random Forest ---
+# education-num est calculé dans l'adapter à partir de education. La cible workclass est absente.
+WC_MARITAL = (('Never-married','Célibataire'), ('Married-civ-spouse','Marié(e)'), ('Married-spouse-absent','Marié(e), conjoint absent'), ('Married-AF-spouse','Marié(e) à un militaire'), ('Divorced','Divorcé(e)'), ('Separated','Séparé(e)'), ('Widowed','Veuf / veuve'))
+WC_RACE = (('White','Blanc'), ('Black','Noir'), ('Asian-Pac-Islander','Asiatique / îles du Pacifique'), ('Amer-Indian-Eskimo','Amérindien / Esquimau'), ('Other','Autre'))
+WC_SEX = (('Male','Homme'), ('Female','Femme'))
+WC_COUNTRY = (('United-States','États-Unis'), ('Mexico','Mexique'), ('Philippines','Philippines'), ('Germany','Allemagne'), ('Canada','Canada'), ('Puerto-Rico','Porto Rico'), ('El-Salvador','Salvador'), ('India','Inde'), ('Cuba','Cuba'), ('England','Angleterre'), ('Jamaica','Jamaïque'), ('China','Chine'), ('Unknown','Autre / non renseigné'))
+
+def workclass_fields():
+    return (
+        age(),
+        FieldSpec('education','Niveau d’études','select', choices=INCOME_EDUCATION),
+        FieldSpec('marital_status','Situation familiale','select', choices=WC_MARITAL),
+        job(),
+        relationship(),
+        FieldSpec('race','Origine ethnique (catégorie UCI)','select', choices=WC_RACE),
+        FieldSpec('sex','Sexe','select', choices=WC_SEX),
+        gain(),
+        loss(),
+        hours(),
+        FieldSpec('native_country','Pays d’origine','select', choices=WC_COUNTRY),
+        income(),
+    )
 # --- Module occupation (clustering) : champs propres au profil ---
 OCC_MARITAL = (('Never-married','Célibataire'), ('Married-civ-spouse','Marié(e)'), ('Married-spouse-absent','Marié(e), conjoint absent'), ('Married-AF-spouse','Marié(e) à un militaire'), ('Divorced','Divorcé(e)'), ('Separated','Séparé(e)'), ('Widowed','Veuf / veuve'))
 OCC_RELATIONSHIP = (('Husband','Époux'), ('Wife','Épouse'), ('Not-in-family','Hors famille'), ('Own-child','Enfant du foyer'), ('Unmarried','Non marié(e)'), ('Other-relative','Autre parent'))
@@ -92,7 +114,7 @@ MODULES = (
     ModuleSpec('has_capital', 'Propension au capital', 'Classification binaire', 'Estimer la probabilité qu’un individu dispose de revenus ou pertes de capital.', 'has_capital','Supervisé','spark','orange','Bilal El Eter (Membre 03)', (age(), edu(), work(), job(), hours(), marital(), relationship(), income(), native_us()), 'Modèle HistGradientBoosting avec pondération des classes. Fuite évitée : exclusion stricte de capital-gain et capital-loss. Seuil optimal calibré à 0.685.'),
     ModuleSpec('hours', 'Temps de travail', 'Classification binaire', 'Estimer si une personne travaille à temps partiel (34 h par semaine ou moins) à partir de son profil.', 'hours-per-week (<= 34 h)','Supervisé','clock','blue','Bessem (Membre 04)', (FieldSpec('age','Âge','integer','Ex. 28','Entre 17 et 90 ans.',minimum=17,maximum=90), FieldSpec('education','Niveau d’études déclaré','select',help='Diplôme le plus élevé obtenu.',choices=EDUCATION), FieldSpec('workclass','Catégorie d’emploi','select',help='Secteur de travail ; « Non renseigné » si inconnu.',choices=WORKCLASS), FieldSpec('occupation','Profession','select',help='Métier principal ; « Non renseigné » si inconnu.',choices=OCCUPATION), FieldSpec('marital_status','Situation familiale','select',help='Situation actuelle.',choices=MARITAL), FieldSpec('capital_gain','Gains en capital (USD / an)','decimal','Ex. 0','Plus-values, dividendes… Mettre 0 s’il n’y en a pas.',minimum=0), FieldSpec('capital_loss','Pertes en capital (USD / an)','decimal','Ex. 0','Pertes sur placements. Mettre 0 s’il n’y en a pas.',minimum=0), FieldSpec('native_us','Origine géographique','select',help='Pays d’origine : États-Unis ou autre pays.',choices=NATIVE_US)), 'Modèle XGBoost réglé (AUC 0,82 ; F1 0,54 ; seuil 0,25). Résultat : probabilité de temps partiel, niveau de priorité de contact et facteurs principaux. Les heures travaillées sont la cible et ne figurent pas dans le formulaire ; sexe, origine ethnique, lien familial et revenu sont exclus.'),
     ModuleSpec('education', 'Niveau d’études', 'Classification binaire', 'Estimer niveau supérieur / niveau non supérieur pour suggérer une orientation initiale.', 'education (2 classes)','Supervisé','graduation','pink','Membre 05', (age(), hours(), gain(), loss(), work(), job(), income()), 'Formulaire compatible avec les sept variables brutes du pipeline XGBoost. Revenu : seuil historique américain en USD ; ce résultat ne vérifie aucun diplôme. À confirmer par l’utilisateur.'),
-    ModuleSpec('workclass', 'Catégorie professionnelle', 'Classification', 'Estimer la catégorie d’emploi selon le profil socio-professionnel.', 'workclass','Supervisé','briefcase','lime','Membre 06', (age(), edu(), job(), hours(), marital()), 'Les caractéristiques sont provisoires : adapter au pipeline du membre 06.'),
+    ModuleSpec('workclass', 'Catégorie professionnelle', 'Classification multiclasse', 'Estimer la catégorie d’emploi selon le profil socio-professionnel.', 'workclass (5 classes)','Supervisé','briefcase','lime','Walid Trojette (Membre 06)', workclass_fields(), 'Random Forest sur 5 classes : Private, Government, Self-employed, Unknown, Other (Without-pay et Never-worked regroupées, ce qui mélange deux situations différentes). Données du recensement américain de 1994 : résultat indicatif, non décisionnel.'),
 )
 
 
