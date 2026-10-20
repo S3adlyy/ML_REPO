@@ -51,7 +51,9 @@ table.cmp{width:100%;border-collapse:collapse;font-size:11.5px}
 .notes ul{margin:0;padding-left:18px;display:grid;gap:8px;font-size:11.5px;color:#9fb0c9;line-height:1.6}
 .cta{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
 @media(max-width:1050px){.gcards,.two,.notes{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:560px){</style>
+.pistes{margin:14px 0 0;padding-top:12px;border-top:1px solid #2a364d;display:grid;gap:9px}.pistes strong{display:block;font-size:11.5px;color:var(--c)}.pistes span{font-size:11px;color:#9fb0c9;line-height:1.55}.pistes .ph{font-size:9.5px;letter-spacing:1.5px;color:#7f8fa8;font-weight:700}
+@media(max-width:560px){.dash .panel{padding:18px}}
+</style>
 
 <div class="dash">
   <div class="kpis">{% for value, label in kpis %}<div class="kpi"><strong>{{ value }}</strong><span>{{ label }}</span></div>{% endfor %}</div>
@@ -75,6 +77,7 @@ table.cmp{width:100%;border-collapse:collapse;font-size:11.5px}
       <div class="meter"><div class="row"><span>Femmes</span><b>{{ g.women }} %</b></div><div class="bar"><i style="width:{{ g.women }}%"></i></div></div>
       <div class="meter"><div class="row"><span>Avec gain de capital</span><b>{{ g.gain }} %</b></div><div class="bar"><i style="width:{{ g.gain }}%"></i></div></div>
       <div class="meter"><div class="row"><span>Avec perte de capital</span><b>{{ g.loss }} %</b></div><div class="bar"><i style="width:{{ g.loss }}%"></i></div></div>
+      <div class="pistes"><span class="ph">PISTES POUR CE PROFIL</span>{% for t, d in g.pistes %}<div><strong>{{ t }}</strong><span>{{ d }}</span></div>{% endfor %}</div>
     </article>
     {% endfor %}
   </div>
@@ -110,7 +113,7 @@ table.cmp{width:100%;border-collapse:collapse;font-size:11.5px}
   <section class="panel notes">
     <div><div class="eyebrow small">/ LIMITES</div><h2>À lire avec prudence</h2>
       <ul><li>Les chiffres sont des moyennes : une personne peut s’écarter de son profil.</li><li>Les profils se touchent aux frontières : ils décrivent des tendances.</li><li>Données de recensement américain de 1994.</li><li>Un profil décrit un groupe, il ne prédit pas un métier.</li></ul></div>
-    <div class="cta"><div><div class="eyebrow small">/ ET VOUS ?</div><h2>Trouvez votre profil</h2><p class="sub" style="margin-bottom:0">Le second onglet vous rattache au profil le plus proche.</p></div><a class="btn btn-primary" href="{% url 'portal:occupation_profil' %}">Trouver mon groupe <svg class="ico"><use href="#icon-arrow"/></svg></a></div>
+    <div class="cta"><div><div class="eyebrow small">/ ET VOUS ?</div><h2>Trouvez votre profil</h2><p class="sub" style="margin-bottom:0">Le second onglet vous rattache au profil le plus proche et vous donne des recommandations personnalisées.</p></div><a class="btn btn-primary" href="{% url 'portal:occupation_profil' %}">Trouver mon groupe <svg class="ico"><use href="#icon-arrow"/></svg></a></div>
   </section>
 </div>
 
