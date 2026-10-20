@@ -39,7 +39,7 @@ class PortalSmokeTests(TestCase):
             if module.slug == 'hours': self.assertNotIn('hours_per_week', keys)
             if module.slug == 'workclass': self.assertNotIn('workclass', keys)
             if module.slug == 'income': self.assertNotIn('income', keys)
-            if module.slug == 'occupation': self.assertNotIn('occupation', keys)
+            if module.slug == 'occupation': pass  # occupation est une colonne d'entrée du pipeline de clustering, pas une cible
 
     def test_has_capital_features_and_no_leakage(self):
         keys = {field.key for field in BY_SLUG['has_capital'].fields}
@@ -268,3 +268,137 @@ class RealHasCapitalModelIntegrationTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsNone(response.context['result'])
 
+
+
+# ---------------------------------------------------------------------------
+# Module hours (temps partiel) — tests sans .joblib : bundle synthétique en mémoire
+# ---------------------------------------------------------------------------
+def _fake_hours_bundle():
+    """Bundle de même structure que celui exporté par le notebook (données aléatoires)."""
+    import numpy as np
+    import pandas as pd
+    from sklearn.preprocessing import StandardScaler
+    from xgboost import XGBClassifier
+    categories = {
+        'workclass': ['Never-worked', 'Private', 'Self-emp-inc', 'Unknown'],
+        'marital-status': ['Divorced', 'Married-civ-spouse', 'Never-married'],
+        'occupation': ['Adm-clerical', 'Exec-managerial', 'Unknown'],
+    }
+    continues = ['age', 'education-num', 'log_capital_gain', 'log_capital_loss']
+    cols = continues + ['has_capital', 'native_us']
+    for name, cats in categories.items():
+        cols += [f'{name}_{c}' for c in cats[1:]]          # drop_first
+    rng = np.random.default_rng(0)
+    x = pd.DataFrame(rng.random((200, len(cols))), columns=cols)
+    y = (x['age'] > 0.5).astype(int)
+    scaler = StandardScaler().fit(x[continues])
+    x[continues] = scaler.transform(x[continues])
+    model = XGBClassifier(n_estimators=5, max_depth=2).fit(x, y)
+    return {'modele': model, 'scaler': scaler, 'colonnes': cols, 'continues': continues,
+            'seuil': 0.26, 'categories': categories}
+
+
+HOURS_PAYLOAD = {'age': 28, 'education': 'Bachelors', 'workclass': 'Private',
+                 'occupation': 'Adm-clerical', 'marital_status': 'Never-married',
+                 'capital_gain': 0, 'capital_loss': 0, 'native_us': '1'}
+
+
+class HoursModuleTests(TestCase):
+    def test_form_fields_exclude_target_and_sensitive(self):
+        keys = {f.key for f in BY_SLUG['hours'].fields}
+        self.assertEqual(keys, {'age', 'education', 'workclass', 'occupation', 'marital_status',
+                                'capital_gain', 'capital_loss', 'native_us'})
+        for banned in ('hours_per_week', 'sex', 'race', 'relationship', 'income'):
+            self.assertNotIn(banned, keys)
+
+    def test_adapter_contract_with_synthetic_bundle(self):
+        from ml_modules.hours import adapter
+        with patch.object(adapter, 'load_pipeline', return_value=_fake_hours_bundle()):
+            out = adapter.predict(dict(HOURS_PAYLOAD))
+        self.assertIsInstance(out['label'], str)
+        self.assertTrue(0.0 <= out['probability_part_time'] <= 1.0)
+        self.assertEqual(out['threshold'], 0.26)
+
+    def test_row_matches_notebook_preprocessing(self):
+        from ml_modules.hours import adapter
+        bundle = _fake_hours_bundle()
+        values = adapter.normalize_profile(dict(HOURS_PAYLOAD, capital_gain=1000))
+        self.assertEqual(values['has_capital'], 1)
+        self.assertEqual(values['education-num'], 13)
+        row = adapter.build_row(values, bundle)
+        self.assertEqual(list(row.columns), bundle['colonnes'])
+        self.assertEqual(row.at[0, 'workclass_Private'], 1)
+        self.assertEqual(row.at[0, 'occupation_Exec-managerial'], 0)
+
+    def test_unknown_category_rejected(self):
+        from ml_modules.hours import adapter
+        with patch.object(adapter, 'load_pipeline', return_value=_fake_hours_bundle()):
+            with self.assertRaises(ValueError):
+                adapter.predict(dict(HOURS_PAYLOAD, occupation='Astronaut'))
+
+    def test_wrong_artifact_format_is_not_ready(self):
+        from ml_modules.hours import adapter
+        with patch.object(adapter, 'load_pipeline', return_value=object()):
+            with self.assertRaises(ModelNotReady):
+                adapter.predict(dict(HOURS_PAYLOAD))
+
+    def test_web_form_with_synthetic_bundle(self):
+        from ml_modules.hours import adapter
+        with patch.object(adapter, 'load_pipeline', return_value=_fake_hours_bundle()):
+            res = self.client.post(reverse('portal:module', args=['hours']), HOURS_PAYLOAD)
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'Résultat estimé')
+
+    def test_form_rejects_out_of_range_age(self):
+        with patch('portal.views.execute') as execute:
+            res = self.client.post(reverse('portal:module', args=['hours']), dict(HOURS_PAYLOAD, age=12))
+            self.assertEqual(res.status_code, 200)
+            execute.assert_not_called()
+
+
+@skipUnless(model_installed('hours'), 'Le modèle hours n’est pas présent dans le dépôt Git')
+class RealHoursModelIntegrationTests(TestCase):
+    """S'exécute seulement en local, avec ml_models/hours/pipeline.joblib."""
+
+    def test_real_model_on_web_form(self):
+        res = self.client.post(reverse('portal:module', args=['hours']), HOURS_PAYLOAD)
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'Résultat estimé')
+
+    def test_real_model_on_json_api(self):
+        res = self.client.post(reverse('portal:predict_api', args=['hours']),
+                               data=json.dumps(HOURS_PAYLOAD), content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+        self.assertIn('probability_part_time', res.json()['result'])
+
+
+class HoursResultDisplayTests(TestCase):
+    """Probabilité, priorité et facteurs : bundle synthétique, aucun .joblib requis."""
+
+    def _predict(self, **overrides):
+        from ml_modules.hours import adapter
+        with patch.object(adapter, 'load_pipeline', return_value=_fake_hours_bundle()):
+            return adapter.predict(dict(HOURS_PAYLOAD, **overrides))
+
+    def test_result_shows_percentage_for_template(self):
+        out = self._predict()
+        self.assertEqual(out['value'], round(out['probability_part_time'] * 100, 1))
+        self.assertIn('probabilité', out['unit'])
+
+    def test_priority_tier_is_consistent_with_probability(self):
+        from ml_modules.hours import adapter
+        out = self._predict()
+        p = out['probability_part_time']
+        expected = 'high' if p >= adapter.HIGH_PROBA else ('medium' if p >= out['threshold'] else 'low')
+        self.assertEqual(out['priority'], expected)
+        self.assertEqual(out['label'], adapter.TIERS[expected][0])
+
+    def test_factors_are_listed_in_note(self):
+        out = self._predict()
+        self.assertLessEqual(len(out['factors']), 3)
+        for factor in out['factors']:
+            self.assertIn(factor, out['note'])
+
+    def test_hours_form_has_help_text_on_every_field(self):
+        for field in BY_SLUG['hours'].fields:
+            self.assertTrue(field.help, field.key)

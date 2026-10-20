@@ -1,0 +1,10 @@
+{
+  "age": 28,
+  "education": "Bachelors",
+  "workclass": "Private",
+  "occupation": "Adm-clerical",
+  "marital_status": "Never-married",
+  "capital_gain": 0,
+  "capital_loss": 0,
+  "native_us": "1"
+}
