@@ -75,8 +75,7 @@ table.cmp{width:100%;border-collapse:collapse;font-size:11.5px}
       <div class="fig"><div><strong>{{ g.age_txt }}</strong><span>ans en moyenne</span></div><div><strong>{{ g.hours_txt }}</strong><span>h / semaine</span></div><div><strong>{{ g.edu_txt }}</strong><span>ans d’études</span></div></div>
       <div class="meter"><div class="row"><span>Revenu supérieur à 50K</span><b>{{ g.high }} %</b></div><div class="bar"><i style="width:{{ g.high }}%"></i></div></div>
       <div class="meter"><div class="row"><span>Femmes</span><b>{{ g.women }} %</b></div><div class="bar"><i style="width:{{ g.women }}%"></i></div></div>
-      <div class="meter"><div class="row"><span>Avec gain de capital</span><b>{{ g.gain }} %</b></div><div class="bar"><i style="width:{{ g.gain }}%"></i></div></div>
-      <div class="meter"><div class="row"><span>Avec perte de capital</span><b>{{ g.loss }} %</b></div><div class="bar"><i style="width:{{ g.loss }}%"></i></div></div>
+      <div class="meter"><div class="row"><span>Avec du capital (gain ou perte)</span><b>{{ g.capital }} %</b></div><div class="bar"><i style="width:{{ g.capital }}%"></i></div></div>
       <div class="pistes"><span class="ph">PISTES POUR CE PROFIL</span>{% for t, d in g.pistes %}<div><strong>{{ t }}</strong><span>{{ d }}</span></div>{% endfor %}</div>
     </article>
     {% endfor %}
@@ -112,7 +111,7 @@ table.cmp{width:100%;border-collapse:collapse;font-size:11.5px}
 
   <section class="panel notes">
     <div><div class="eyebrow small">/ LIMITES</div><h2>À lire avec prudence</h2>
-      <ul><li>Les chiffres sont des moyennes : une personne peut s’écarter de son profil.</li><li>Les profils se touchent aux frontières : ils décrivent des tendances.</li><li>Données de recensement américain de 1994.</li><li>Un profil décrit un groupe, il ne prédit pas un métier.</li></ul></div>
+      <ul><li>Les chiffres sont des moyennes : une personne peut s’écarter de son profil.</li><li>Les profils se touchent aux frontières : ils décrivent des tendances.</li><li>Données de recensement américain de 1994.</li><li>Les profils sont très liés à l’âge.</li><li>Un profil décrit un groupe, il ne prédit pas un métier.</li></ul></div>
     <div class="cta"><div><div class="eyebrow small">/ ET VOUS ?</div><h2>Trouvez votre profil</h2><p class="sub" style="margin-bottom:0">Le second onglet vous rattache au profil le plus proche et vous donne des recommandations personnalisées.</p></div><a class="btn btn-primary" href="{% url 'portal:occupation_profil' %}">Trouver mon groupe <svg class="ico"><use href="#icon-arrow"/></svg></a></div>
   </section>
 </div>
