@@ -1,6 +1,8 @@
 """Configuration Django de développement pour l'équipe. Ne pas utiliser telle quelle en production."""
 import os
 import hashlib
+import base64
+import binascii
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
 from pathlib import Path
@@ -11,10 +13,15 @@ load_dotenv(BASE_DIR / '.env', override=False)
 ON_RENDER = os.getenv('RENDER') == 'true'
 DEBUG = os.getenv('DJANGO_DEBUG', '0' if ON_RENDER else '1') == '1'
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'dev-only-change-this-key-before-deployment')
-# Render generates a cryptographically random 32-character secret. Hashing it
-# preserves its entropy and provides Django's recommended 50+ character format.
-if ON_RENDER and len(SECRET_KEY) == 32 and not SECRET_KEY.startswith('dev-only'):
-    SECRET_KEY = hashlib.sha256(SECRET_KEY.encode()).hexdigest()
+# Render generates 256 random bits encoded as Base64 (44 characters).
+# Normalize only that format, preserving its entropy for Django's length check.
+if ON_RENDER and len(SECRET_KEY) == 44:
+    try:
+        render_secret = base64.b64decode(SECRET_KEY, validate=True)
+    except (ValueError, binascii.Error):
+        render_secret = b''
+    if len(render_secret) == 32:
+        SECRET_KEY = hashlib.sha256(SECRET_KEY.encode()).hexdigest()
 if not DEBUG and (len(SECRET_KEY) < 50 or SECRET_KEY.startswith('dev-only')):
     raise ImproperlyConfigured('Set a strong DJANGO_SECRET_KEY (at least 50 characters) for production.')
 
