@@ -2,12 +2,13 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8"><link rel="icon" href="{% static 'portal/favicon.svg' %}" type="image/svg+xml">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0c1120">
   <meta name="description" content="Prisma ML Studio — portail collaboratif de six modèles de machine learning.">
   <title>{% block title %}Prisma — ML Studio{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'portal/css/app.css' %}">
+  <link rel="stylesheet" href="{% static 'portal/css/product.css' %}">
   <script src="{% static 'portal/js/app.js' %}" defer></script>
 </head>
 <body>
@@ -36,9 +37,9 @@
       <span class="brand-symbol"><span></span><span></span><span></span><span></span></span>
       <span class="brand-word">prisma<span class="brand-dot">.</span><small>ML STUDIO</small></span>
     </a>
-    <div class="sidebar-label">ESPACE DE TRAVAIL</div>
-    <a class="nav-link {% if active == 'home' %}is-active{% endif %}" href="{% url 'portal:home' %}"><svg class="ico"><use href="#icon-grid"/></svg><span>Vue d’ensemble</span><svg class="ico ico-end"><use href="#icon-chevron"/></svg></a>
-    <div class="sidebar-label sidebar-label-modules">NOS 6 EXPÉRIENCES <span>06</span></div>
+    <div class="sidebar-label">VOTRE ESPACE</div>
+    <a class="nav-link {% if active == 'dashboard' %}is-active{% endif %}" href="{% url 'portal:dashboard' %}"><svg class="ico"><use href="#icon-grid"/></svg><span>Vue d’ensemble</span><svg class="ico ico-end"><use href="#icon-chevron"/></svg></a>
+    <div class="sidebar-label sidebar-label-modules">EXPLORATIONS <span>06</span></div>
     <nav aria-label="Modules de l'équipe" class="module-nav">
       {% for item in sidebar_modules %}
       <a href="{% url 'portal:module' item.slug %}" class="nav-link {% if active == item.slug %}is-active{% endif %}">
@@ -48,18 +49,15 @@
       </a>
       {% endfor %}
     </nav>
-    <div class="sidebar-bottom">
-      <div class="sidebar-tip"><svg class="ico"><use href="#icon-spark"/></svg><div><strong>Un espace. Six modèles.</strong><p>Une plateforme créée en équipe.</p></div></div>
-      <div class="sidebar-credit"><span class="avatar-mini">ML</span><div><strong>Adult ML · Équipe</strong><small>Projet académique collaboratif</small></div></div>
-    </div>
+    <div class="sidebar-bottom"><div class="sidebar-tip"><svg class="ico"><use href="#icon-spark"/></svg><div><strong>Votre profil, votre point de départ.</strong><p>Quelques réponses pour une expérience plus fluide.</p><a href="{% url 'portal:onboarding' %}">Personnaliser mon profil ↗</a></div></div>{% if user.is_authenticated %}<div class="sidebar-credit"><span class="avatar-mini">{{ user.first_name|default:user.email|first|upper }}</span><div><strong>{{ user.first_name|default:'Mon compte' }}</strong><small>Espace personnel</small></div><form method="post" action="{% url 'portal:signout' %}">{% csrf_token %}<button class="logout-button" aria-label="Se déconnecter" title="Se déconnecter">↪</button></form></div>{% else %}<a class="btn btn-primary sidebar-cta" href="{% url 'portal:signup' %}">Créer mon compte ↗</a>{% endif %}</div>
   </aside>
   <div class="main-area">
     <header class="topbar">
       <button id="menu-toggle" class="mobile-menu" aria-label="Ouvrir le menu" aria-controls="sidebar" aria-expanded="false"><svg class="ico"><use href="#icon-menu"/></svg></button>
       <div class="breadcrumbs"><span>Workspace</span><svg class="ico"><use href="#icon-chevron"/></svg><strong>{% block breadcrumb %}Vue d’ensemble{% endblock %}</strong></div>
-      <div class="topbar-right"><span class="topbar-live"><i></i> Projet collaboratif</span><span class="topbar-avatar">ML</span></div>
+      <div class="topbar-right"><a href="{% url 'portal:home' %}">Découvrir Prisma ↗</a>{% if user.is_authenticated %}<a class="topbar-avatar" href="{% url 'portal:onboarding' %}" aria-label="Modifier mon profil">{{ user.first_name|default:user.email|first|upper }}</a>{% else %}<a class="btn btn-primary" href="{% url 'portal:signin' %}">Se connecter</a>{% endif %}</div>
     </header>
-    <main class="page-content">{% block content %}{% endblock %}</main>
+    <main class="page-content">{% for message in messages %}<div class="notice" role="status">{{ message }}</div>{% endfor %}{% block content %}{% endblock %}</main>
     <footer class="site-footer"><span>© 2026 Prisma ML Studio · Projet pédagogique</span><span>Construit pour apprendre, pas pour décider à la place des personnes.</span></footer>
   </div>
 </div>

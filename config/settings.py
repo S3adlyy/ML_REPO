@@ -1,8 +1,10 @@
 """Configuration Django de développement pour l'équipe. Ne pas utiliser telle quelle en production."""
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / '.env', override=False)
 DEBUG = os.getenv('DJANGO_DEBUG', '1') == '1'
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'dev-only-change-this-key-before-deployment')
 ALLOWED_HOSTS = [h.strip() for h in os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if h.strip()]
@@ -49,3 +51,15 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024  # corps JSON petit
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = False  # nécessaire si le frontend doit lire le token AJAX
 # Avant production : HTTPS, cookies Secure, DATABASE_URL, logs, CSP, rate limits.
+
+LOGIN_URL = '/signin/'
+FIREBASE_CONFIG = {
+    'apiKey': os.getenv('FIREBASE_API_KEY', ''),
+    'authDomain': os.getenv('FIREBASE_AUTH_DOMAIN', ''),
+    'projectId': os.getenv('FIREBASE_PROJECT_ID', ''),
+    'appId': os.getenv('FIREBASE_APP_ID', ''),
+}
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+
+FIREBASE_SERVER_READY = bool(os.getenv('GOOGLE_APPLICATION_CREDENTIALS') or os.getenv('FIREBASE_USE_APPLICATION_DEFAULT_CREDENTIALS') == '1')

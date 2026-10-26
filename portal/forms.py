@@ -2,7 +2,7 @@
 from django import forms
 
 
-def create_profile_form(module, data=None):
+def create_profile_form(module, data=None, initial=None):
     attrs = {}
     for field in module.fields:
         css = 'input-control'
@@ -23,4 +23,4 @@ def create_profile_form(module, data=None):
                 widget=forms.NumberInput(attrs={'class': css, 'placeholder': field.placeholder}), **kw
             )
     DynamicForm = type(f'{module.slug.title()}ProfileForm', (forms.Form,), attrs)
-    return DynamicForm(data=data)
+    return DynamicForm(data=data, initial=initial)

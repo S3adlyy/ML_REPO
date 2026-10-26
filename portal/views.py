@@ -1,3 +1,4 @@
+from .accounts import profile_initial, record_analysis
 import json
 import logging
 from django.http import Http404, JsonResponse
@@ -36,11 +37,12 @@ def home(request):
 
 def module_detail(request, slug):
     module = resolve_module(slug)
-    form = create_profile_form(module, data=request.POST if request.method == 'POST' else None)
+    form = create_profile_form(module, data=request.POST if request.method == 'POST' else None, initial=profile_initial(request, module))
     result, warning = None, None
     if request.method == 'POST' and form.is_valid():
         try:
             result = execute(module, form.cleaned_data)
+            record_analysis(request, module, result)
         except ModelNotReady as exc:
             warning = str(exc)
         except Exception:
@@ -65,6 +67,7 @@ def predict_api(request, slug):
         return JsonResponse({'error': 'Champs invalides.', 'fields': form.errors.get_json_data()}, status=400)
     try:
         result = execute(module, form.cleaned_data)
+        record_analysis(request, module, result)
         return JsonResponse({'module': slug, 'result': result})
     except ModelNotReady as exc:
         return JsonResponse({'error': str(exc), 'status': 'not_ready'}, status=503)
