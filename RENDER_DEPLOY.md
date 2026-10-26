@@ -6,7 +6,7 @@
 - The web service sleeps after 15 idle minutes and can take about a minute to wake.
 - Free PostgreSQL expires after 30 days; demo profiles/history must be exported before expiration if needed.
 - Free web instances share the workspace's 750 monthly hours. Existing services also consume this allowance.
-- One synchronous Gunicorn worker avoids duplicate model caches. The 512 MB memory limit needs live verification with all six models; no paid upgrade is authorized.
+- One synchronous Gunicorn worker avoids duplicate model caches. Workclass reads its 300 trees progressively to fit the 512 MB memory limit; no paid upgrade is authorized.
 - Automatic deployment is disabled; deploy approved changes manually.
 
 Source: https://render.com/docs/free
@@ -16,6 +16,8 @@ Source: https://render.com/docs/free
 The seven current `.joblib` files are bundled without retraining or reserializing. The bundle is approximately 52.5 MiB compressed. `ml_models/deployment-manifest.json` pins the bundle and each file with SHA-256 hashes. Builds reject missing, changed, unexpected, or corrupted artifacts and exercise all six adapters before deployment.
 
 The user approved publishing `prisma-models-v1.zip` as the public `models-v1` GitHub release. Its URL is configured in the Blueprint. Do not commit credentials or signed URLs. The package has only model files, no Firebase credentials, `.env`, profiles, or database records.
+
+The build derives a private runtime copy of the Workclass forest with one file per tree. All 300 fitted trees and the original preprocessing remain unchanged; scikit-learn averages their probabilities using one inference job. This avoids loading the 185 MB forest into the web process at once. The build compares 18 synthetic profiles against the original pipeline before and after serialization (tolerance 1e-12). The original release and its checksums remain unchanged. The runtime rejects a derived copy if its source checksum no longer matches. Regenerate it with `python scripts/prepare_workclass.py` after replacing the original model.
 
 Repackage future approved model updates with:
 
