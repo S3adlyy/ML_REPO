@@ -23,6 +23,30 @@ class OccupationTabsTests(TestCase):
         from unittest.mock import patch
         data = dict(age=29, education_num=10, hours_per_week=40, workclass='Private', marital_status='Never-married',
                     occupation='Sales', relationship='Not-in-family', sex='Female', income='<=50K')
-        with patch('portal.views.execute', return_value={'label': 'Jeunes célibataires', 'segment': '1', 'note': 'x'}):
+        from ml_modules.occupation.recommandations import recommander
+        reco = recommander('1', data)
+        with patch('portal.views.execute', return_value={'label': 'Les Nouveaux Départs', 'segment': '1', 'note': 'x', 'reco': reco}):
             res = self.client.post(reverse('portal:occupation_profil'), data)
-        self.assertContains(res, 'Votre groupe')
+        self.assertContains(res, 'Votre profil')
+        self.assertContains(res, 'RECOMMANDATIONS')
+        self.assertContains(res, 'Les Nouveaux Départs')
+        self.assertContains(res, 'Investir tôt dans une formation')
+
+
+class RecommandationsTests(TestCase):
+    def test_every_group_has_three_pistes_and_no_gender_advice(self):
+        from ml_modules.occupation.recommandations import GROUPES, recommander
+        base = dict(age=30, education_num=9, hours_per_week=40, sex='Female')
+        for seg in GROUPES:
+            r = recommander(seg, base)
+            self.assertEqual(len(r['pistes']), 3)
+            texte = ' '.join(p['titre'] + p['texte'] for p in r['pistes']).lower()
+            for mot in ('femme', 'homme', 'sexe'):
+                self.assertNotIn(mot, texte)
+
+    def test_gap_depends_on_education(self):
+        from ml_modules.occupation.recommandations import recommander
+        bas = recommander('1', dict(age=25, education_num=8, hours_per_week=35))['ecart']
+        haut = recommander('1', dict(age=25, education_num=13, hours_per_week=35))['ecart']
+        self.assertIn('il vous manque', bas)
+        self.assertIn('atteint déjà', haut)
