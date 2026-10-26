@@ -1,20 +1,21 @@
 # Deploy Prisma to Render
 
-## Proposed resources — approval required before creating
+## Free demo resources
 
-- Python web service in Frankfurt: Standard / 1 CPU, 2 GB RAM, currently $25/month.
-- PostgreSQL in Frankfurt: Basic 256 MB, currently $6/month, with external database access disabled.
-- Estimated base total: $31/month on a Hobby workspace, excluding taxes, bandwidth/storage extras, and any existing workspace subscription. Reconfirm prices in Render before applying.
-- One synchronous Gunicorn worker avoids loading separate copies of the 185 MB workclass model. Requests queue during inference; this is intended for a small team. Measure real Linux memory and response times before increasing concurrency.
+- Free Python web service and free PostgreSQL in Frankfurt; no paid instance plans.
+- The web service sleeps after 15 idle minutes and can take about a minute to wake.
+- Free PostgreSQL expires after 30 days; demo profiles/history must be exported before expiration if needed.
+- Free web instances share the workspace's 750 monthly hours. Existing services also consume this allowance.
+- One synchronous Gunicorn worker avoids duplicate model caches. The 512 MB memory limit needs live verification with all six models; no paid upgrade is authorized.
 - Automatic deployment is disabled; deploy approved changes manually.
 
-Source: https://render.com/pricing and https://render.com/docs/deploy-django
+Source: https://render.com/docs/free
 
 ## Model distribution
 
 The seven current `.joblib` files are bundled without retraining or reserializing. The bundle is approximately 52.5 MiB compressed. `ml_models/deployment-manifest.json` pins the bundle and each file with SHA-256 hashes. Builds reject missing, changed, unexpected, or corrupted artifacts and exercise all six adapters before deployment.
 
-Choose an approved storage location for `prisma-models-v1.zip`. A release asset in this public GitHub repository will make the trained models publicly downloadable. Alternatively use an HTTPS object-storage URL accessible to the build (a secret signed URL is supported, but must be valid at every rebuild). Do not commit credentials or signed URLs. The package has only model files, no Firebase credentials, `.env`, profiles, or database records.
+The user approved publishing `prisma-models-v1.zip` as the public `models-v1` GitHub release. Its URL is configured in the Blueprint. Do not commit credentials or signed URLs. The package has only model files, no Firebase credentials, `.env`, profiles, or database records.
 
 Repackage future approved model updates with:
 
@@ -27,8 +28,8 @@ Review and commit the changed manifest together with any adapter/dependency upda
 ## Deployment steps
 
 1. Review and merge the deployment pull request, or explicitly select its branch in Render.
-2. In Render, choose New → Blueprint and select `S3adlyy/ML_REPO`. Review `render.yaml` and the proposed charges before applying.
-3. Supply `MODEL_BUNDLE_URL` and `FIREBASE_API_KEY` when prompted. The other public Firebase settings are in the Blueprint. Render generates `DJANGO_SECRET_KEY` and connects `DATABASE_URL` automatically.
+2. In Render, choose New → Blueprint and select `S3adlyy/ML_REPO`. Verify both resources show the Free plan before applying.
+3. Supply `FIREBASE_API_KEY` when prompted. The other public Firebase settings are in the Blueprint. Render generates `DJANGO_SECRET_KEY` and connects `DATABASE_URL` automatically.
 4. Add a Render secret file named `firebase-service-account.json` containing the existing Firebase service-account JSON. `GOOGLE_APPLICATION_CREDENTIALS` points to `/etc/secrets/firebase-service-account.json`. Never commit the key to GitHub. Upload it before accepting sign-ups.
 5. Run a manual deployment. The build installs dependencies, verifies/downloads model files, collects static files, and runs six model smoke checks. Startup applies database migrations and starts Gunicorn.
 6. Add the final `*.onrender.com` hostname to Firebase Authentication → Settings → Authorized domains. Django accepts `RENDER_EXTERNAL_HOSTNAME` and trusts its HTTPS origin automatically. For a custom domain, also configure `DJANGO_ALLOWED_HOSTS` and `DJANGO_CSRF_TRUSTED_ORIGINS`.

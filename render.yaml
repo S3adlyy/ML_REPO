@@ -1,10 +1,10 @@
-# Paid deployment proposal: review the selected plans before applying.
+# Free demo deployment; free PostgreSQL expires after 30 days.
 services:
   - type: web
     name: prisma-ml
     runtime: python
     region: frankfurt
-    plan: standard
+    plan: free
     buildCommand: bash build.sh
     startCommand: bash start.sh
     healthCheckPath: /health/
@@ -19,7 +19,7 @@ services:
           name: prisma-db
           property: connectionString
       - key: MODEL_BUNDLE_URL
-        sync: false
+        value: https://github.com/S3adlyy/ML_REPO/releases/download/models-v1/prisma-models-v1.zip
       - key: FIREBASE_API_KEY
         sync: false
       - key: FIREBASE_AUTH_DOMAIN
@@ -39,7 +39,7 @@ services:
 databases:
   - name: prisma-db
     region: frankfurt
-    plan: basic-256mb
+    plan: free
     databaseName: prisma
     user: prisma
     ipAllowList: []
