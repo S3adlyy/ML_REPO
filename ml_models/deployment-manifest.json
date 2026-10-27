@@ -1,0 +1,34 @@
+{
+  "format": 1,
+  "files": {
+    "income/pipeline.joblib": {
+      "sha256": "eb3819665ea5e1a3b6934a6cd2e32572eb6c07d6500ca24fe241110dc980d674",
+      "size": 985491
+    },
+    "occupation/pipeline.joblib": {
+      "sha256": "7567e6c033e6558e61ac5b0eeb4b3c37b809003349a15c72357c0653d5fc4071",
+      "size": 201057
+    },
+    "has_capital/pipeline.joblib": {
+      "sha256": "e21f12e372cdcb2e74877e4be59fdccc6be9da8e8f15ee74bd2a281ec3f74f39",
+      "size": 251713
+    },
+    "hours/pipeline.joblib": {
+      "sha256": "e660fc50cc4fefa0a0c60a0aa263697bcadeadd7de39472bf41ac17ac5b52de8",
+      "size": 775234
+    },
+    "education/pipeline.joblib": {
+      "sha256": "b8eddcbfe820a1d85c227f8b8ab9cec32eaf4a4989e2255b77b16cab3805d527",
+      "size": 72565
+    },
+    "workclass/pipeline.joblib": {
+      "sha256": "a749deaec6f4156da123c386383a1f845931f53a8e5a6068b7719f5e01455c9a",
+      "size": 193599130
+    },
+    "occupation/pipeline_complet.joblib": {
+      "sha256": "04b6d399eaeebf5cece65d59d23bcf3761b807feab94241de4fdf5ca71ccc743",
+      "size": 204001
+    }
+  },
+  "bundle_sha256": "4c607cad95a075e5ca2d69449bb490c7195c9b6d3344c4cab957adc94df5e244"
+}

@@ -33,7 +33,14 @@ def _load():
             import joblib
         except ImportError as exc:
             raise ModelNotReady('Installez joblib et les dépendances du pipeline.') from exc
-        _ARTEFACT = joblib.load(model_path('workclass'))  # fichier de confiance uniquement
+        source = model_path('workclass')
+        streamed = source.with_name('pipeline-streamed.joblib')
+        artifact = joblib.load(streamed if streamed.is_file() else source)
+        if streamed.is_file():
+            from .streaming import source_digest
+            if artifact.get('source_sha256') != source_digest(source):
+                raise ModelNotReady('Reconstruisez le modèle progressif après une mise à jour du modèle original.')
+        _ARTEFACT = artifact
     return _ARTEFACT
 
 

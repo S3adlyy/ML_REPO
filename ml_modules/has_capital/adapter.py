@@ -12,6 +12,7 @@ Aucun ré-encodage n'est effectué dans Django.
 """
 from functools import lru_cache
 import json
+import re
 from pathlib import Path
 
 from ml_modules.common import ModelNotReady, load_pipeline, sample_frame
@@ -49,6 +50,22 @@ EDUCATION_TO_NUM = {
     'Doctorate': 16,
 }
 
+# Libellés affichés à l'utilisateur (sans mention technique "has_capital = 0/1").
+# On ne modifie pas model_metadata.json : il est protégé par les hash SHA-256
+# du deployment-manifest.json.
+USER_LABELS = {
+    '0': 'Aucun capital significatif déclaré',
+    '1': 'Détention de capital probable',
+}
+
+# Filet de sécurité : supprime tout suffixe technique du type "(has_capital = 0)".
+_TECHNICAL_SUFFIX = re.compile(r'\s*\(\s*has_capital\s*=\s*[01]\s*\)', re.IGNORECASE)
+
+
+def clean_label(text: str) -> str:
+    """Retire les mentions techniques d'un libellé."""
+    return _TECHNICAL_SUFFIX.sub('', str(text)).strip()
+
 
 @lru_cache(maxsize=1)
 def read_metadata():
@@ -69,7 +86,6 @@ def read_metadata():
 
 def normalize_profile(profile: dict) -> dict:
     """Valide et prépare le dictionnaire des variables brutes."""
-    # Validation minimale des champs
     required = {'age', 'workclass', 'occupation', 'hours_per_week', 'marital_status', 'relationship', 'income'}
     missing = required - set(profile.keys())
     if missing:
@@ -90,28 +106,28 @@ def normalize_profile(profile: dict) -> dict:
         raise ValueError('Durée de travail attendue entre 1 et 99 heures.')
 
     # Conversion de l'éducation en education-num
-    if 'education-num' in profile:
-        edu_num = int(profile['education-num'])
-    elif 'education_num' in profile:
-        edu_num = int(profile['education_num'])
-    elif 'education' in profile:
-        edu_str = str(profile['education'])
-        if edu_str.isdigit():
-            edu_num = int(edu_str)
+    try:
+        if 'education-num' in profile:
+            edu_num = int(profile['education-num'])
+        elif 'education_num' in profile:
+            edu_num = int(profile['education_num'])
+        elif 'education' in profile:
+            edu_str = str(profile['education'])
+            if edu_str.isdigit():
+                edu_num = int(edu_str)
+            else:
+                edu_num = EDUCATION_TO_NUM.get(edu_str, 9)
         else:
-            edu_num = EDUCATION_TO_NUM.get(edu_str, 9)
-    else:
-        edu_num = 9
+            edu_num = 9
+    except (ValueError, TypeError):
+        raise ValueError('Niveau d’études invalide.')
 
     if not 1 <= edu_num <= 16:
         raise ValueError('Niveau d’études (années) doit être compris entre 1 et 16.')
 
-    # Conversion de l'origine géographique native_us (1 = États-Unis, 0 = autre)
+    # native_us : 1 = États-Unis, 0 = autre
     raw_native = profile.get('native_us', profile.get('native-country', '1'))
-    if str(raw_native) in ('1', 'United-States', 'true', 'True'):
-        native_us_val = 1
-    else:
-        native_us_val = 0
+    native_us_val = 1 if str(raw_native) in ('1', 'United-States', 'true', 'True') else 0
 
     return {
         'age': age_val,
@@ -149,7 +165,9 @@ def predict(profile: dict) -> dict:
 
     threshold = float(meta['threshold'])
     outcome = '1' if score >= threshold else '0'
-    label = meta['label_mapping'][outcome]
+
+    # Libellé propre : nos libellés d'abord, sinon celui du metadata nettoyé.
+    label = USER_LABELS.get(outcome) or clean_label(meta['label_mapping'][outcome])
 
     return {
         'label': label,
@@ -158,8 +176,7 @@ def predict(profile: dict) -> dict:
         'threshold': threshold,
         'has_capital': outcome == '1',
         'note': (
-            'Estimation indicative basée sur le profil socio-professionnel. '
-            'Modèle calibré au seuil optimal (rappel 50 %, lift x2.9 sur le 1er décile), '
-            'sans utilisation des variables de capital réelles pour éviter toute fuite.'
+            'Estimation indicative basée sur votre profil socio-professionnel. '
+            'Ce n’est pas une décision.'
         ),
     }
