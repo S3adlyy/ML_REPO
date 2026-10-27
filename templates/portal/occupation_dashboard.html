@@ -34,7 +34,7 @@
 .fig strong{display:block;font-size:17px;color:#e9edfb;letter-spacing:-.5px}.fig span{font-size:9.5px;color:#7f8fa8}
 .meter{margin-bottom:10px;font-size:10.5px;color:#aab9d2}
 .meter .row{display:flex;justify-content:space-between;margin-bottom:4px}.meter b{color:#e4e9f7}
-.meter .bar{height:6px;border-radius:4px;background:#243049;overflow:hidden}.meter .bar i{display:block;height:100%;background:var(--c)}
+.meter .bar{height:6px;border-radius:4px;background:#243049;overflow:hidden}.meter .bar i{display:block;width:var(--meter-width);height:100%;background:var(--c)}
 .cmpgrid{display:grid;gap:16px}.cm strong{display:block;font-size:11.5px;color:#d6deed;margin-bottom:6px}.cb{display:grid;grid-template-columns:1fr 78px;align-items:center;gap:10px;margin-bottom:5px}.cb .bar{height:9px;border-radius:5px;background:#243049;overflow:hidden}.cb .bar i{display:block;height:100%;background:var(--c)}.cb em{font-style:normal;font-size:11px;color:#e4e9f7;font-weight:650;text-align:right}
 .two{display:grid;grid-template-columns:1.2fr 1fr;gap:20px}
 .take{display:grid;gap:12px}
@@ -73,9 +73,9 @@ table.cmp{width:100%;border-collapse:collapse;font-size:11.5px}
       <h3>{{ g.name }}</h3>
       <p>{{ g.blurb }}</p>
       <div class="fig"><div><strong>{{ g.age_txt }}</strong><span>ans en moyenne</span></div><div><strong>{{ g.hours_txt }}</strong><span>h / semaine</span></div><div><strong>{{ g.edu_txt }}</strong><span>ans d’études</span></div></div>
-      <div class="meter"><div class="row"><span>Revenu supérieur à 50K</span><b>{{ g.high }} %</b></div><div class="bar"><i style="width:{{ g.high }}%"></i></div></div>
-      <div class="meter"><div class="row"><span>Femmes</span><b>{{ g.women }} %</b></div><div class="bar"><i style="width:{{ g.women }}%"></i></div></div>
-      <div class="meter"><div class="row"><span>Avec du capital (gain ou perte)</span><b>{{ g.capital }} %</b></div><div class="bar"><i style="width:{{ g.capital }}%"></i></div></div>
+      <div class="meter"><div class="row"><span>Revenu supérieur à 50K</span><b>{{ g.high }} %</b></div><div class="bar"><i style="--meter-width:{{ g.high }}%"></i></div></div>
+      <div class="meter"><div class="row"><span>Femmes</span><b>{{ g.women }} %</b></div><div class="bar"><i style="--meter-width:{{ g.women }}%"></i></div></div>
+      <div class="meter"><div class="row"><span>Avec du capital (gain ou perte)</span><b>{{ g.capital }} %</b></div><div class="bar"><i style="--meter-width:{{ g.capital }}%"></i></div></div>
       <div class="pistes"><span class="ph">PISTES POUR CE PROFIL</span>{% for t, d in g.pistes %}<div><strong>{{ t }}</strong><span>{{ d }}</span></div>{% endfor %}</div>
     </article>
     {% endfor %}
