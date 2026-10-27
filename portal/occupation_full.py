@@ -7,7 +7,6 @@
 Cette page n'ajoute pas de module au catalogue (accueil et /health/ inchangés).
 """
 import logging
-from .accounts import profile_initial, record_analysis
 
 from django.shortcuts import render
 
@@ -74,12 +73,11 @@ def occupation_profil(request):
     """Onglet « Trouver mon groupe » : formulaire à 9 variables."""
     from .views import execute
     module = BY_SLUG['occupation']
-    form = create_profile_form(module, data=request.POST if request.method == 'POST' else None, initial=profile_initial(request, module))
+    form = create_profile_form(module, data=request.POST if request.method == 'POST' else None)
     result, warning = None, None
     if request.method == 'POST' and form.is_valid():
         try:
             result = execute(module, form.cleaned_data)
-            record_analysis(request, module, result)
         except ModelNotReady as exc:
             warning = str(exc)
         except Exception:
